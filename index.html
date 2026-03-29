@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>FA Sky Dodge</title>
+  <style>
+    :root{
+      --bg1:#0b1020;--bg2:#17112e;--gold:#e6c37a;--panel:rgba(255,255,255,.08);--line:rgba(255,255,255,.12);--text:#f7f2e8;--muted:rgba(247,242,232,.68);--danger:#ff7a7a;--good:#8cffb0;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;height:100%;background:#090d19;color:var(--text);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;overflow:hidden}
+    body{
+      background:
+        radial-gradient(circle at 20% 10%, rgba(83,127,255,.22), transparent 22%),
+        radial-gradient(circle at 80% 15%, rgba(240,191,87,.16), transparent 20%),
+        radial-gradient(circle at 50% 100%, rgba(160,80,255,.12), transparent 34%),
+        linear-gradient(180deg, var(--bg2), var(--bg1));
+    }
+    .wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px}
+    .game-shell{position:relative;width:min(100%,430px);height:min(100%,900px);max-height:100dvh;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));box-shadow:0 25px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08)}
+    canvas{display:block;width:100%;height:100%;touch-action:none;background:transparent}
+    .hud{position:absolute;inset:0;pointer-events:none;padding:16px;display:flex;flex-direction:column;justify-content:space-between}
+    .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .brand{padding:12px 14px;border-radius:18px;background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line)}
+    .brand .eyebrow{font-size:11px;letter-spacing:.22em;color:var(--gold);font-weight:800;text-transform:uppercase}
+    .brand .title{font-size:22px;font-weight:900;margin-top:3px}
+    .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:170px}
+    .stat{padding:10px 12px;border-radius:16px;background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--line);text-align:right}
+    .stat .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.16em}
+    .stat .v{font-size:20px;font-weight:900;margin-top:4px}
+    .bottom{display:flex;justify-content:space-between;gap:8px;align-items:flex-end}
+    .records{padding:12px 14px;border-radius:18px;background:var(--panel);border:1px solid var(--line);backdrop-filter:blur(8px);max-width:62%}
+    .records .head{font-size:12px;letter-spacing:.18em;color:var(--gold);font-weight:800;text-transform:uppercase;margin-bottom:6px}
+    .records .line{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .controls{display:flex;gap:8px;pointer-events:auto}
+    button{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.09);color:var(--text);border-radius:16px;padding:12px 14px;font-weight:800;cursor:pointer;backdrop-filter:blur(8px)}
+    button.primary{background:linear-gradient(145deg, rgba(230,195,122,.98), rgba(156,112,42,.98));color:#16120a;border-color:rgba(255,231,179,.45)}
+    .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:linear-gradient(180deg, rgba(6,10,20,.28), rgba(6,10,20,.72));backdrop-filter:blur(8px)}
+    .hidden{display:none!important}
+    .card{width:min(100%,360px);padding:24px;border-radius:28px;background:linear-gradient(180deg, rgba(27,21,49,.95), rgba(12,18,34,.96));border:1px solid var(--line);box-shadow:0 25px 80px rgba(0,0,0,.45);text-align:center}
+    .eyebrow{font-size:11px;color:var(--gold);font-weight:800;letter-spacing:.22em;text-transform:uppercase}
+    h1{font-size:36px;line-height:1;margin:10px 0 8px}
+    p{font-size:14px;color:var(--muted);line-height:1.6;margin:0}
+    .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+    .meta .box{padding:12px 10px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+    .box .k{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+    .box .v{font-size:18px;font-weight:900;margin-top:5px}
+    .actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:18px}
+    .hint{margin-top:14px;font-size:12px;color:var(--muted)}
+    .toast{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);padding:10px 14px;border-radius:999px;background:rgba(13,17,29,.9);border:1px solid var(--line);font-size:13px;font-weight:800;opacity:0;transition:.24s;pointer-events:none}
+    .toast.show{opacity:1;bottom:102px}
+    @media (max-width:480px){.wrap{padding:0}.game-shell{width:100%;height:100dvh;border-radius:0;border:0}.brand .title{font-size:19px}.stat .v{font-size:18px}.records{max-width:58%}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="game-shell">
+    <canvas id="game"></canvas>
+    <div class="hud">
+      <div class="top">
+        <div class="brand">
+          <div class="eyebrow">FA Mini Game</div>
+          <div class="title">Sky Dodge</div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="k">Score</div><div class="v" id="score">0</div></div>
+          <div class="stat"><div class="k">Stars</div><div class="v" id="stars">0</div></div>
+          <div class="stat"><div class="k">Best</div><div class="v" id="best">0</div></div>
+          <div class="stat"><div class="k">Speed</div><div class="v" id="speed">1.0x</div></div>
+        </div>
+      </div>
+      <div class="bottom">
+        <div class="records">
+          <div class="head">Top Records</div>
+          <div id="records"></div>
+        </div>
+        <div class="controls">
+          <button id="soundBtn">Sound On</button>
+          <button id="pauseBtn">Pause</button>
+        </div>
+      </div>
+    </div>
+    <div class="overlay" id="startOverlay">
+      <div class="card">
+        <div class="eyebrow">Endless Dodge</div>
+        <h1>Enter the Sky</h1>
+        <p>Dodge incoming drones, collect star shards, and survive as long as possible. Designed for mobile and GitHub Pages.</p>
+        <div class="meta">
+          <div class="box"><div class="k">Control</div><div class="v">Drag</div></div>
+          <div class="box"><div class="k">Mode</div><div class="v">Endless</div></div>
+          <div class="box"><div class="k">Goal</div><div class="v">Survive</div></div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="startBtn">Game Start</button>
+        </div>
+        <div class="hint">Mobile: drag left and right · PC: mouse drag or arrow keys</div>
+      </div>
+    </div>
+    <div class="overlay hidden" id="gameOverOverlay">
+      <div class="card">
+        <div class="eyebrow">Mission Complete</div>
+        <h1 id="gameOverTitle">Game Over</h1>
+        <p id="gameOverText">Your run has ended.</p>
+        <div class="meta">
+          <div class="box"><div class="k">Score</div><div class="v" id="finalScore">0</div></div>
+          <div class="box"><div class="k">Stars</div><div class="v" id="finalStars">0</div></div>
+          <div class="box"><div class="k">Best</div><div class="v" id="finalBest">0</div></div>
+        </div>
+        <div class="actions">
+          <button class="primary" id="restartBtn">Play Again</button>
+          <button id="lobbyBtn">Lobby</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" id="toast">Saved</div>
+  </div>
+</div>
+<script>
+(() => {
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const scoreEl = document.getElementById('score');
+  const starsEl = document.getElementById('stars');
+  const bestEl = document.getElementById('best');
+  const speedEl = document.getElementById('speed');
+  const recordsEl = document.getElementById('records');
+  const startOverlay = document.getElementById('startOverlay');
+  const gameOverOverlay = document.getElementById('gameOverOverlay');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const lobbyBtn = document.getElementById('lobbyBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const soundBtn = document.getElementById('soundBtn');
+  const finalScore = document.getElementById('finalScore');
+  const finalStars = document.getElementById('finalStars');
+  const finalBest = document.getElementById('finalBest');
+  const gameOverText = document.getElementById('gameOverText');
+  const toast = document.getElementById('toast');
+
+  const BEST_KEY = 'fa_sky_dodge_best_v1';
+  const STAR_KEY = 'fa_sky_dodge_stars_v1';
+  const RECORD_KEY = 'fa_sky_dodge_records_v1';
+  let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  let w = 0, h = 0;
+  let running = false, paused = false, gameOver = false, soundOn = true;
+  let score = 0, stars = Number(localStorage.getItem(STAR_KEY) || 0), best = Number(localStorage.getItem(BEST_KEY) || 0);
+  let time = 0, obstacleTimer = 0, starTimer = 0, speedMul = 1;
+  let keys = {};
+  let particles = [];
+  let obstacles = [];
+  let starsOrbs = [];
+  let trails = [];
+  let audioCtx = null;
+  let pointerDown = false;
+
+  const ship = { x: 0, y: 0, w: 34, h: 54, vx: 0, targetX: 0 };
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    w = rect.width; h = rect.height;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ship.y = h - 120;
+    if (!running) ship.x = w * 0.5;
+    ship.targetX = ship.x;
+  }
+
+  function readRecords() {
+    try { return JSON.parse(localStorage.getItem(RECORD_KEY) || '[]'); } catch { return []; }
+  }
+  function saveRecord(v) {
+    const list = readRecords();
+    list.push(v);
+    list.sort((a,b)=>b-a);
+    localStorage.setItem(RECORD_KEY, JSON.stringify(list.slice(0,5)));
+    renderRecords();
+  }
+  function renderRecords() {
+    const list = readRecords();
+    if (!list.length) { recordsEl.innerHTML = '<div class="line">No records yet</div>'; return; }
+    recordsEl.innerHTML = list.map((v,i)=>`<div class="line">${i+1}. ${v}</div>`).join('');
+  }
+  function syncHud() {
+    scoreEl.textContent = Math.floor(score);
+    starsEl.textContent = stars;
+    bestEl.textContent = best;
+    speedEl.textContent = speedMul.toFixed(1) + 'x';
+  }
+  function showToast(t) {
+    toast.textContent = t; toast.classList.add('show');
+    clearTimeout(showToast._t); showToast._t = setTimeout(()=>toast.classList.remove('show'), 1200);
+  }
+  function initAudio() {
+    if (audioCtx) return;
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
+  }
+  function beep(freq=440, dur=.08, type='sine', gain=.03) {
+    if (!soundOn || !audioCtx) return;
+    const t0 = audioCtx.currentTime;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(gain, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(audioCtx.destination); o.start(t0); o.stop(t0 + dur);
+  }
+
+  function resetGame() {
+    score = 0; time = 0; obstacleTimer = 0; starTimer = 0; speedMul = 1;
+    obstacles = []; starsOrbs = []; particles = []; trails = [];
+    gameOver = false; paused = false;
+    ship.x = w * 0.5; ship.targetX = ship.x; ship.vx = 0; ship.y = h - 120;
+    syncHud();
+  }
+
+  function startGame() {
+    initAudio();
+    resetGame();
+    running = true;
+    startOverlay.classList.add('hidden');
+    gameOverOverlay.classList.add('hidden');
+    beep(520,.08,'triangle',.04);
+  }
+  function endGame() {
+    running = false; gameOver = true;
+    if (score > best) { best = Math.floor(score); localStorage.setItem(BEST_KEY, best); }
+    localStorage.setItem(STAR_KEY, String(stars));
+    saveRecord(Math.floor(score));
+    syncHud();
+    finalScore.textContent = Math.floor(score);
+    finalStars.textContent = stars;
+    finalBest.textContent = best;
+    gameOverText.textContent = `You dodged the sky storm and secured ${Math.floor(score)} points.`;
+    gameOverOverlay.classList.remove('hidden');
+    beep(180,.22,'sawtooth',.05);
+    setTimeout(()=>beep(130,.28,'triangle',.04),100);
+  }
+
+  function spawnObstacle() {
+    const lanes = 5;
+    const laneW = w / lanes;
+    const lane = Math.floor(Math.random() * lanes);
+    const size = 24 + Math.random() * 22;
+    const x = lane * laneW + laneW * .5;
+    obstacles.push({ x, y: -50, w: size, h: size * (1.1 + Math.random() * .6), rot: Math.random()*Math.PI, vr: (Math.random()-.5)*2.5, speed: 260 + Math.random()*120 });
+  }
+  function spawnStar() {
+    starsOrbs.push({ x: 30 + Math.random()*(w-60), y: -30, r: 10, speed: 170 + Math.random()*60, pulse: Math.random()*Math.PI*2 });
+  }
+  function explode(x,y,c='#ffd36f',n=16) {
+    for (let i=0;i<n;i++) {
+      const a = Math.random()*Math.PI*2, s = 60+Math.random()*120;
+      particles.push({ x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.5+Math.random()*.5,size:2+Math.random()*3,c });
+    }
+  }
+  function collideRect(a,b) {
+    return Math.abs(a.x-b.x) < (a.w+b.w)/2 && Math.abs(a.y-b.y) < (a.h+b.h)/2;
+  }
+
+  function update(dt) {
+    if (!running || paused) return;
+    time += dt;
+    speedMul = 1 + Math.min(2.4, time * 0.035);
+    score += dt * 14 * speedMul;
+    obstacleTimer += dt;
+    starTimer += dt;
+    if (obstacleTimer > Math.max(.22, .75 - time*0.015)) { obstacleTimer = 0; spawnObstacle(); }
+    if (starTimer > 1.35) { starTimer = 0; if (Math.random() > .15) spawnStar(); }
+
+    let input = 0;
+    if (keys['ArrowLeft'] || keys['a']) input -= 1;
+    if (keys['ArrowRight'] || keys['d']) input += 1;
+    if (input) ship.targetX += input * 320 * dt;
+    ship.targetX = Math.max(24, Math.min(w-24, ship.targetX));
+    ship.x += (ship.targetX - ship.x) * Math.min(1, dt * 11);
+
+    trails.push({x:ship.x,y:ship.y+18,life:.22});
+    if (trails.length > 50) trails.shift();
+
+    for (let i = obstacles.length-1; i>=0; i--) {
+      const o = obstacles[i];
+      o.y += o.speed * speedMul * dt;
+      o.rot += o.vr * dt;
+      if (o.y > h + 80) { obstacles.splice(i,1); continue; }
+      if (collideRect({x:ship.x,y:ship.y,w:ship.w*.72,h:ship.h*.72},{x:o.x,y:o.y,w:o.w,h:o.h})) {
+        explode(ship.x, ship.y, '#ff7a7a', 24);
+        endGame();
+        return;
+      }
+    }
+    for (let i = starsOrbs.length-1; i>=0; i--) {
+      const s = starsOrbs[i];
+      s.y += s.speed * dt; s.pulse += dt * 6;
+      if (s.y > h + 30) { starsOrbs.splice(i,1); continue; }
+      const dx = ship.x - s.x, dy = ship.y - s.y;
+      if ((dx*dx + dy*dy) < 24*24) {
+        stars += 1; starsOrbs.splice(i,1); explode(s.x,s.y,'#8cffb0',12); beep(880,.08,'triangle',.035); showToast('+1 Star');
+      }
+    }
+    for (let i = particles.length-1; i>=0; i--) {
+      const p = particles[i]; p.life -= dt; p.x += p.vx*dt; p.y += p.vy*dt; p.vy += 120*dt;
+      if (p.life <= 0) particles.splice(i,1);
+    }
+    for (let i = trails.length-1; i>=0; i--) {
+      trails[i].life -= dt; if (trails[i].life <= 0) trails.splice(i,1);
+    }
+    syncHud();
+  }
+
+  function drawBg() {
+    const g = ctx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0,'#1a1634'); g.addColorStop(.6,'#0f1d34'); g.addColorStop(1,'#071019');
+    ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+    for (let i=0;i<60;i++) {
+      const y = (i*160 + (time*50)%160) % (h+160) - 80;
+      const x = (i*53)%w;
+      ctx.fillStyle = 'rgba(255,255,255,.06)';
+      ctx.fillRect(x,y,2,38);
+    }
+    for (let i=0;i<26;i++) {
+      const x = (i*97.37)%w, y = (i*57.21 + time*10)%h;
+      ctx.fillStyle = 'rgba(255,255,255,.22)';
+      ctx.fillRect(x,y,2,2);
+    }
+  }
+  function drawShip() {
+    for (const t of trails) {
+      ctx.globalAlpha = Math.max(0, t.life / .22) * .45;
+      ctx.fillStyle = '#79d8ff';
+      ctx.beginPath(); ctx.ellipse(t.x, t.y+20, 5, 18, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#ffd36f';
+      ctx.beginPath(); ctx.ellipse(t.x, t.y+30, 3, 10, 0, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.save();
+    ctx.translate(ship.x, ship.y);
+    ctx.fillStyle = '#e7edf8';
+    ctx.beginPath();
+    ctx.moveTo(0,-28); ctx.lineTo(15,18); ctx.lineTo(0,11); ctx.lineTo(-15,18); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#90baff';
+    ctx.beginPath(); ctx.moveTo(0,-20); ctx.lineTo(8,10); ctx.lineTo(0,6); ctx.lineTo(-8,10); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#6f80ff'; ctx.fillRect(-18,4,36,5);
+    ctx.fillStyle = '#ffd36f'; ctx.fillRect(-3,17,6,10);
+    ctx.restore();
+  }
+  function drawObstacle(o) {
+    ctx.save(); ctx.translate(o.x,o.y); ctx.rotate(o.rot);
+    ctx.fillStyle = '#8b95b6'; ctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);
+    ctx.fillStyle = '#d6def5'; ctx.fillRect(-o.w*.18,-o.h/2,o.w*.36,o.h);
+    ctx.fillStyle = '#ff6d6d'; ctx.fillRect(-o.w/2,-3,o.w,6);
+    ctx.restore();
+  }
+  function drawStar(s) {
+    ctx.save(); ctx.translate(s.x,s.y); ctx.scale(1 + Math.sin(s.pulse)*.08, 1 + Math.sin(s.pulse)*.08);
+    ctx.fillStyle = '#ffd36f';
+    ctx.beginPath();
+    for (let i=0;i<5;i++) {
+      const a = -Math.PI/2 + i * Math.PI * 2/5;
+      const a2 = a + Math.PI/5;
+      const r1 = s.r, r2 = s.r*0.45;
+      if (i===0) ctx.moveTo(Math.cos(a)*r1, Math.sin(a)*r1);
+      else ctx.lineTo(Math.cos(a)*r1, Math.sin(a)*r1);
+      ctx.lineTo(Math.cos(a2)*r2, Math.sin(a2)*r2);
+    }
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  function drawParticles() {
+    for (const p of particles) {
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.c;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(.033, (now-last)/1000); last = now;
+    update(dt);
+    drawBg();
+    for (const s of starsOrbs) drawStar(s);
+    for (const o of obstacles) drawObstacle(o);
+    drawShip(); drawParticles();
+    requestAnimationFrame(frame);
+  }
+
+  function setPointer(clientX) {
+    const rect = canvas.getBoundingClientRect();
+    ship.targetX = Math.max(24, Math.min(rect.width-24, clientX - rect.left));
+  }
+
+  canvas.addEventListener('pointerdown', e => { pointerDown = true; setPointer(e.clientX); initAudio(); });
+  canvas.addEventListener('pointermove', e => { if (pointerDown) setPointer(e.clientX); });
+  window.addEventListener('pointerup', () => pointerDown = false);
+  window.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    if (e.key === ' ') { e.preventDefault(); if (running) { paused = !paused; pauseBtn.textContent = paused ? 'Resume' : 'Pause'; beep(620,.05,'square',.025); } }
+  });
+  window.addEventListener('keyup', e => keys[e.key] = false);
+  startBtn.addEventListener('click', startGame);
+  restartBtn.addEventListener('click', startGame);
+  lobbyBtn.addEventListener('click', () => { gameOverOverlay.classList.add('hidden'); startOverlay.classList.remove('hidden'); resetGame(); });
+  pauseBtn.addEventListener('click', () => {
+    if (!running) return; paused = !paused; pauseBtn.textContent = paused ? 'Resume' : 'Pause'; beep(620,.05,'square',.025);
+  });
+  soundBtn.addEventListener('click', () => { soundOn = !soundOn; soundBtn.textContent = soundOn ? 'Sound On' : 'Sound Off'; showToast(soundOn ? 'Sound On' : 'Sound Off'); });
+  window.addEventListener('resize', resize);
+
+  renderRecords(); syncHud(); resize(); resetGame(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
