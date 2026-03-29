@@ -1,0 +1,11 @@
+// Optional: fill this file with your real Firebase project settings.
+// When left as-is, the game still works with local ranking only.
+window.FA_FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
