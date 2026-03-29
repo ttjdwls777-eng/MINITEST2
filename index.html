@@ -3,21 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>FA Street Rush Deluxe</title>
+<title>FA Street Rush Ultimate</title>
 <style>
   :root{
-    --sky1:#7fd2ff; --sky2:#c7efff; --road:#4f525d; --road2:#676a73;
-    --panelA:rgba(17,28,59,.72); --panelB:rgba(255,255,255,.14);
-    --line:rgba(255,255,255,.22); --txt:#f8fbff; --muted:#d9e7ff;
-    --green:#84ee53; --gold:#ffd65a; --orange:#ffb44d; --red:#ff6d5d; --blue:#4dbdff;
+    --skyA:#78cbff; --skyB:#d6f3ff; --skyC:#ffeabf;
+    --panelA:rgba(14,27,56,.82); --panelB:rgba(255,255,255,.14);
+    --line:rgba(255,255,255,.2); --txt:#f8fbff; --muted:#d5e6ff;
+    --gold:#ffd85a; --green:#7dea4d; --red:#ff6a5d; --blue:#4dc1ff; --violet:#8d79ff;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;height:100%;overflow:hidden;background:#8ad7ff;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--txt)}
+  html,body{margin:0;height:100%;overflow:hidden;background:linear-gradient(180deg,var(--skyA),var(--skyB));font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--txt)}
   canvas{display:block;width:100vw;height:100vh}
+  button,input{font:inherit}
+  .hidden{display:none!important}
+  .glass{
+    background:linear-gradient(180deg,var(--panelB),var(--panelA));
+    border:1px solid var(--line);
+    box-shadow:0 18px 42px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.16);
+    backdrop-filter:blur(10px)
+  }
   .hud{position:fixed;inset:0;pointer-events:none}
-  .top{position:absolute;left:50%;top:max(10px,env(safe-area-inset-top));transform:translateX(-50%);width:min(1140px,calc(100vw - 18px));display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-  .glass{backdrop-filter:blur(10px);background:linear-gradient(180deg,var(--panelB),var(--panelA));border:1px solid var(--line);box-shadow:0 18px 42px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.14)}
-  .brand{padding:12px 16px;border-radius:22px;min-width:250px}
+  .top{
+    position:absolute;left:50%;top:max(10px,env(safe-area-inset-top));transform:translateX(-50%);
+    width:min(1160px,calc(100vw - 18px));display:flex;justify-content:space-between;gap:10px;align-items:flex-start
+  }
+  .brand{padding:12px 16px;border-radius:22px;min-width:260px}
   .brand .eyebrow{font-size:11px;font-weight:900;letter-spacing:.24em;text-transform:uppercase;color:#fff1ad}
   .brand .title{margin-top:4px;font-size:30px;line-height:1;font-weight:1000}
   .brand .sub{margin-top:5px;font-size:13px;color:var(--muted)}
@@ -25,31 +35,51 @@
   .chip{pointer-events:auto;padding:10px 14px;border-radius:18px;min-width:116px}
   .chip .label{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
   .chip .value{margin-top:4px;font-size:28px;line-height:1;font-weight:1000}
-  .message{position:absolute;left:50%;top:110px;transform:translateX(-50%);padding:11px 16px;border-radius:999px;background:rgba(19,30,58,.42);border:1px solid rgba(255,255,255,.17);backdrop-filter:blur(8px);font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;text-align:center;max-width:calc(100vw - 24px)}
-  .controls{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));display:flex;gap:10px;pointer-events:auto}
+  .message{
+    position:absolute;left:50%;top:110px;transform:translateX(-50%);
+    padding:11px 16px;border-radius:999px;background:rgba(19,30,58,.42);
+    border:1px solid rgba(255,255,255,.17);backdrop-filter:blur(8px);
+    font-size:12px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;text-align:center;max-width:calc(100vw - 24px)
+  }
+  .controls{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));display:flex;gap:10px;pointer-events:auto;flex-wrap:wrap;justify-content:flex-end}
   .mobilePads{position:absolute;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));display:none;gap:12px;pointer-events:auto}
-  button{appearance:none;border:none;border-radius:18px;padding:13px 17px;font-size:15px;font-weight:900;color:#17304d;cursor:pointer;background:linear-gradient(180deg,#ffffff,#dfefff);box-shadow:0 14px 34px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.95)}
+  button{
+    appearance:none;border:none;border-radius:18px;padding:13px 17px;font-size:15px;font-weight:900;color:#17304d;cursor:pointer;
+    background:linear-gradient(180deg,#ffffff,#dfefff);box-shadow:0 14px 34px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.95)
+  }
   button.primary{background:linear-gradient(180deg,#beff9d,#72dc49)}
   button.gold{background:linear-gradient(180deg,#ffe48b,#ffbb3e)}
+  button.blue{background:linear-gradient(180deg,#a0e6ff,#57bfff)}
+  button.red{background:linear-gradient(180deg,#ffd1cb,#ff8f7f)}
   .pad{width:78px;height:78px;border-radius:50%;display:grid;place-items:center;font-size:28px;font-weight:1000;color:#17304d;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(220,239,255,.84));box-shadow:0 14px 34px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.95)}
-  .overlay{position:fixed;inset:0;display:grid;place-items:center;padding:18px;background:linear-gradient(180deg,rgba(23,39,76,.08),rgba(11,18,38,.54))}
-  .hidden{display:none!important}
-  .card{width:min(94vw,840px);padding:28px;border-radius:32px;text-align:center;color:white;background:linear-gradient(180deg,rgba(19,36,69,.82),rgba(12,20,39,.9));border:1px solid rgba(255,255,255,.18);box-shadow:0 24px 60px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(10px)}
+  .overlay{position:fixed;inset:0;display:grid;place-items:center;padding:18px;background:linear-gradient(180deg,rgba(23,39,76,.08),rgba(11,18,38,.58))}
+  .card{width:min(94vw,960px);padding:28px;border-radius:32px;text-align:center;color:white;background:linear-gradient(180deg,rgba(19,36,69,.84),rgba(12,20,39,.92));border:1px solid rgba(255,255,255,.18);box-shadow:0 24px 60px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(10px)}
   .card .eyebrow{font-size:12px;font-weight:900;letter-spacing:.24em;text-transform:uppercase;color:#fff2a7}
   .card h1{margin:10px 0 0;font-size:clamp(34px,8vw,74px);line-height:.95;font-weight:1000}
-  .card p{margin:14px auto 0;max-width:680px;font-size:15px;line-height:1.65;color:#dce8ff}
+  .card p{margin:14px auto 0;max-width:760px;font-size:15px;line-height:1.65;color:#dce8ff}
   .row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:22px}
-  .tipbox,.shopBox{margin-top:18px;padding:15px 16px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#cfe1ff;font-size:13px;line-height:1.7}
+  .grid2{display:grid;grid-template-columns:1.25fr .95fr;gap:16px;margin-top:20px;text-align:left}
+  .panel{padding:16px;border-radius:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+  .panel h3{margin:0 0 10px;font-size:18px}
+  .mini{font-size:13px;color:#d4e4ff;line-height:1.7}
+  .dailyRow,.missionRow,.rankRow,.skinRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+  .dailyRow:last-child,.missionRow:last-child,.rankRow:last-child,.skinRow:last-child{border-bottom:0}
+  .badge{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:12px;font-weight:900;letter-spacing:.08em}
+  .coin{color:#ffe48b}
+  .ok{color:#aefb8c}
+  .danger{color:#ffb0a4}
+  .input{width:100%;height:48px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#fff;padding:0 14px}
+  .tabs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+  .tabBtn.active{outline:2px solid rgba(255,216,90,.48)}
+  .scrollArea{max-height:min(54vh,520px);overflow:auto;padding-right:6px}
   .shopGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
-  .skin{padding:12px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);text-align:left}
-  .skin .name{font-weight:900}
-  .skin .meta{margin-top:4px;font-size:12px;color:#d5e4ff}
-  .skin.active{outline:2px solid rgba(255,214,90,.66);background:rgba(255,214,90,.09)}
-  .miniBtns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-  .miniBtns button{padding:10px 12px;border-radius:14px;font-size:13px}
-  @media (max-width:920px){
+  .skinCard{padding:12px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);text-align:left}
+  .skinCard.active{outline:2px solid rgba(255,214,90,.66);background:rgba(255,214,90,.09)}
+  .tipbox{margin-top:18px;padding:15px 16px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#cfe1ff;font-size:13px;line-height:1.7}
+  @media (max-width:1020px){
     .top{flex-direction:column;align-items:stretch}
-    .message{top:180px}
+    .message{top:184px}
+    .grid2{grid-template-columns:1fr}
   }
   @media (max-width:820px){
     .shopGrid{grid-template-columns:1fr}
@@ -57,7 +87,7 @@
   @media (max-width:760px){
     .mobilePads{display:flex}
     .controls{left:50%;transform:translateX(-50%);right:auto}
-    .message{top:208px;font-size:11px}
+    .message{top:212px;font-size:11px}
     .chip{min-width:calc(50% - 6px)}
     .chip .value{font-size:24px}
   }
@@ -69,9 +99,9 @@
 <div class="hud">
   <div class="top">
     <div class="brand glass">
-      <div class="eyebrow">FA Mini World Deluxe</div>
+      <div class="eyebrow">FA Mini World Ultimate</div>
       <div class="title">Street Rush</div>
-      <div class="sub">Premium cartoon runner · jump, slide, shop, skins</div>
+      <div class="sub">Premium runner · jump · slide · missions · daily reward · ranking</div>
     </div>
     <div class="chips">
       <div class="chip glass"><div class="label">Score</div><div class="value" id="score">0</div></div>
@@ -81,7 +111,7 @@
     </div>
   </div>
 
-  <div class="message" id="message">Move left and right · jump low barriers · slide under signs · collect coins</div>
+  <div class="message" id="message">Move lanes · jump low barriers · slide under signs · collect coins</div>
 
   <div class="mobilePads">
     <button class="pad" id="leftBtn">◀</button>
@@ -91,25 +121,76 @@
   </div>
 
   <div class="controls">
-    <button class="gold" id="shopBtn">Shop</button>
+    <button class="gold" id="lobbyBtn">Lobby</button>
+    <button class="blue" id="shopBtn">Shop</button>
     <button id="pauseBtn">Pause</button>
     <button id="restartBtn">Restart</button>
   </div>
 </div>
 
-<div class="overlay" id="startOverlay">
+<div class="overlay" id="lobbyOverlay">
   <div class="card">
-    <div class="eyebrow">Premium Runner Upgrade</div>
-    <h1>RUN THE CITY</h1>
-    <p>Bright arcade road, premium cartoon runner, lane dodge gameplay, jump and slide actions, collectible coins, and a built-in skin shop. This build is designed to feel closer to polished mobile runner games while staying GitHub-ready as a single-file game.</p>
-    <div class="row">
-      <button class="primary" id="startBtn">Start Run</button>
-      <button class="gold" id="openShopStartBtn">Open Shop</button>
+    <div class="eyebrow">Ultimate Runner Lobby</div>
+    <h1>Street Rush</h1>
+    <p>More accurate collision, more animated runner behavior, brighter premium road visuals, daily reward, missions, skin shop, and ranking. Online ranking is included as Firebase-ready mode. To make the live online board work, add your Firebase settings in <code>firebase-config.js</code>.</p>
+
+    <div class="tabs">
+      <button class="gold tabBtn active" data-tab="home">Home</button>
+      <button class="tabBtn" data-tab="missions">Missions</button>
+      <button class="tabBtn" data-tab="daily">Daily Reward</button>
+      <button class="tabBtn" data-tab="ranking">Ranking</button>
+      <button class="tabBtn" data-tab="shop">Shop</button>
     </div>
-    <div class="tipbox">
-      Desktop: A / D or ← / → to move lanes · W / ↑ / Space to jump · S / ↓ to slide<br>
-      Mobile: left / right / jump / slide pads<br>
-      Goal: avoid cars, jump barriers, slide under signs, collect coins
+
+    <div class="grid2">
+      <div class="panel scrollArea" id="tab-home">
+        <h3>Start Run</h3>
+        <div class="mini">Choose your nickname and jump into the city. Your local stats are saved on this device. If Firebase is configured, the online ranking can sync your best score too.</div>
+        <div style="margin-top:12px">
+          <input id="nicknameInput" class="input" maxlength="18" placeholder="Enter nickname" />
+        </div>
+        <div class="row" style="justify-content:flex-start">
+          <button class="primary" id="startBtn">Start Run</button>
+          <button class="blue" id="claimDailyBtn">Claim Daily Reward</button>
+        </div>
+        <div class="tipbox">
+          Desktop: A / D or ← / → to move lanes · W / ↑ / Space to jump · S / ↓ to slide<br>
+          Mobile: left / right / jump / slide pads<br>
+          Goal: avoid cars, jump barriers, slide under signs, collect coins, clear missions
+        </div>
+      </div>
+
+      <div class="panel scrollArea" id="tab-missions" style="display:none">
+        <h3>Missions</h3>
+        <div id="missionsList"></div>
+      </div>
+
+      <div class="panel scrollArea" id="tab-daily" style="display:none">
+        <h3>Daily Reward</h3>
+        <div id="dailyList"></div>
+      </div>
+
+      <div class="panel scrollArea" id="tab-ranking" style="display:none">
+        <h3>Ranking</h3>
+        <div class="mini" id="rankStatus">Local ranking mode</div>
+        <div style="margin-top:12px" id="rankingList"></div>
+      </div>
+
+      <div class="panel scrollArea" id="tab-shop" style="display:none">
+        <h3>Skin Shop</h3>
+        <div class="mini">Coins: <strong id="shopCoins">0</strong></div>
+        <div class="shopGrid" id="shopGrid"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Profile</h3>
+        <div class="dailyRow"><span>Nickname</span><strong id="profileName">Guest</strong></div>
+        <div class="dailyRow"><span>Best Score</span><strong id="profileBest">0</strong></div>
+        <div class="dailyRow"><span>Total Coins</span><strong id="profileCoins">0</strong></div>
+        <div class="dailyRow"><span>Selected Skin</span><strong id="profileSkin">Classic Runner</strong></div>
+        <div class="dailyRow"><span>Daily Reward</span><strong id="profileDaily">Ready</strong></div>
+        <div class="dailyRow"><span>Online Ranking</span><strong id="profileOnline">Firebase Ready</strong></div>
+      </div>
     </div>
   </div>
 </div>
@@ -121,84 +202,104 @@
     <p id="gameOverText">Score 0 · Coins 0</p>
     <div class="row">
       <button class="primary" id="againBtn">Play Again</button>
-      <button class="gold" id="openShopGameOverBtn">Shop</button>
+      <button class="gold" id="backLobbyBtn">Lobby</button>
     </div>
   </div>
 </div>
 
-<div class="overlay hidden" id="shopOverlay">
-  <div class="card">
-    <div class="eyebrow">Skin Shop</div>
-    <h1>STYLE UP</h1>
-    <p>Choose a premium character color set. Purchased skins stay saved locally on this device.</p>
-    <div class="shopBox">
-      <div>Coins available: <strong id="shopCoins">0</strong></div>
-      <div class="shopGrid" id="shopGrid"></div>
-    </div>
-    <div class="row">
-      <button id="closeShopBtn">Close Shop</button>
-    </div>
-  </div>
-</div>
-
+<script src="./firebase-config.js"></script>
 <script>
 (() => {
-  const STORAGE_KEY = 'fa_street_rush_deluxe_v1';
-  const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d');
-
+  const STORAGE_KEY = 'fa_street_rush_ultimate_v1';
   const DEFAULT_SKINS = [
     {id:'classic', name:'Classic Runner', price:0, body:'#f07a34', hood:'#df5b23', shorts:'#1f3557', accent:'#65e968'},
     {id:'neon', name:'Neon Flux', price:120, body:'#28c9ff', hood:'#1591ff', shorts:'#1d2e68', accent:'#ffea5b'},
     {id:'royal', name:'Royal Sprint', price:220, body:'#8a6bff', hood:'#5b46ff', shorts:'#1c2257', accent:'#ffd65a'}
   ];
+  const MISSION_DEFS = [
+    {id:'score_500', label:'Reach score 500', target:500, type:'bestScore', reward:60},
+    {id:'coins_50', label:'Collect 50 coins total', target:50, type:'coinsTotal', reward:45},
+    {id:'runs_5', label:'Play 5 runs', target:5, type:'runsTotal', reward:35},
+    {id:'jump_20', label:'Perform 20 jumps', target:20, type:'jumpTotal', reward:30},
+    {id:'slide_20', label:'Perform 20 slides', target:20, type:'slideTotal', reward:30},
+  ];
+  const DAILY_REWARD = [25,35,50,70,100,140,200];
 
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  let ownedSkins = Array.isArray(saved.ownedSkins) ? saved.ownedSkins : ['classic'];
+  if (!ownedSkins.includes('classic')) ownedSkins.push('classic');
+  let selectedSkin = saved.selectedSkin && ownedSkins.includes(saved.selectedSkin) ? saved.selectedSkin : 'classic';
+  let nickname = (saved.nickname || 'Guest').slice(0,18);
+  let best = Number(saved.best || 0);
+  let totalCoins = Number(saved.coins || 0);
+  let stats = Object.assign({
+    runsTotal:0, coinsTotal:0, jumpTotal:0, slideTotal:0, bestScore:best
+  }, saved.stats || {});
+  let missionClaims = Object.assign({}, saved.missionClaims || {});
+  let daily = Object.assign({
+    day:0, lastClaimDate:'', streak:0
+  }, saved.daily || {});
+  let localRanking = Array.isArray(saved.localRanking) ? saved.localRanking : [];
+
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
   const ui = {
     score: document.getElementById('score'),
     best: document.getElementById('best'),
     coins: document.getElementById('coins'),
     speed: document.getElementById('speed'),
     message: document.getElementById('message'),
-    startOverlay: document.getElementById('startOverlay'),
+    lobbyOverlay: document.getElementById('lobbyOverlay'),
     gameOverOverlay: document.getElementById('gameOverOverlay'),
-    shopOverlay: document.getElementById('shopOverlay'),
     gameOverText: document.getElementById('gameOverText'),
     startBtn: document.getElementById('startBtn'),
-    openShopStartBtn: document.getElementById('openShopStartBtn'),
-    openShopGameOverBtn: document.getElementById('openShopGameOverBtn'),
+    claimDailyBtn: document.getElementById('claimDailyBtn'),
     againBtn: document.getElementById('againBtn'),
+    backLobbyBtn: document.getElementById('backLobbyBtn'),
     shopBtn: document.getElementById('shopBtn'),
-    closeShopBtn: document.getElementById('closeShopBtn'),
+    lobbyBtn: document.getElementById('lobbyBtn'),
     pauseBtn: document.getElementById('pauseBtn'),
     restartBtn: document.getElementById('restartBtn'),
     leftBtn: document.getElementById('leftBtn'),
     rightBtn: document.getElementById('rightBtn'),
     jumpBtn: document.getElementById('jumpBtn'),
     slideBtn: document.getElementById('slideBtn'),
+    nicknameInput: document.getElementById('nicknameInput'),
+    missionsList: document.getElementById('missionsList'),
+    dailyList: document.getElementById('dailyList'),
+    rankingList: document.getElementById('rankingList'),
+    rankStatus: document.getElementById('rankStatus'),
     shopCoins: document.getElementById('shopCoins'),
-    shopGrid: document.getElementById('shopGrid')
+    shopGrid: document.getElementById('shopGrid'),
+    profileName: document.getElementById('profileName'),
+    profileBest: document.getElementById('profileBest'),
+    profileCoins: document.getElementById('profileCoins'),
+    profileSkin: document.getElementById('profileSkin'),
+    profileDaily: document.getElementById('profileDaily'),
+    profileOnline: document.getElementById('profileOnline'),
+    tabBtns: [...document.querySelectorAll('.tabBtn')],
+    tabs: {
+      home: document.getElementById('tab-home'),
+      missions: document.getElementById('tab-missions'),
+      daily: document.getElementById('tab-daily'),
+      ranking: document.getElementById('tab-ranking'),
+      shop: document.getElementById('tab-shop'),
+    }
   };
 
-  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-  let ownedSkins = Array.isArray(saved.ownedSkins) ? saved.ownedSkins : ['classic'];
-  if (!ownedSkins.includes('classic')) ownedSkins.push('classic');
-  let selectedSkin = saved.selectedSkin && ownedSkins.includes(saved.selectedSkin) ? saved.selectedSkin : 'classic';
-  let best = Number(saved.best || 0);
-  let totalCoins = Number(saved.coins || 0);
+  const firebaseReady = !!(window.FA_FIREBASE_CONFIG && window.FA_FIREBASE_CONFIG.apiKey);
+  ui.profileOnline.textContent = firebaseReady ? 'Configured' : 'Firebase Ready';
+  ui.rankStatus.textContent = firebaseReady ? 'Online ranking available after you wire Firebase logic.' : 'Local ranking mode · add Firebase config for live online board';
+  ui.nicknameInput.value = nickname;
 
   let W=0,H=0,DPR=1;
   let running=false, paused=false, gameOver=false;
   let score=0, runCoins=0, speed=1, lastTs=0, distance=0, roadOffset=0;
   let shake=0, flash=0, clouds=[], obstacles=[], particles=[], sideProps=[], coinTrail=[];
   const lanes = [-1,0,1];
-
   const state = {
     player:{
-      lane:0, x:0, y:0,
-      bob:0, step:0, lean:0,
-      jumpY:0, jumpV:0, jumping:false,
-      sliding:false, slideTimer:0,
-      lanePulse:0
+      lane:0,x:0,y:0,bob:0,step:0,lean:0,jumpY:0,jumpV:0,jumping:false,sliding:false,slideTimer:0,lanePulse:0
     }
   };
 
@@ -210,151 +311,84 @@
     ctx.setTransform(DPR,0,0,DPR,0,0);
     state.player.y = H*0.82;
   }
-  addEventListener('resize', resize);
-  resize();
+  addEventListener('resize', resize); resize();
 
-  function rand(a,b){ return a + Math.random()*(b-a); }
-  function lerp(a,b,t){ return a + (b-a)*t; }
-  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+  const rand=(a,b)=>a+Math.random()*(b-a);
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
-  function currentSkin(){
-    return DEFAULT_SKINS.find(s => s.id === selectedSkin) || DEFAULT_SKINS[0];
+  function shade(hex, amt){
+    const c = hex.replace('#',''); const n = parseInt(c,16);
+    let r=(n>>16)&255,g=(n>>8)&255,b=n&255; r=clamp(r+amt,0,255); g=clamp(g+amt,0,255); b=clamp(b+amt,0,255);
+    return `rgb(${r},${g},${b})`;
   }
+  const lighten=(h,a)=>shade(h,a);
+  const darken=(h,a)=>shade(h,-a);
+
+  function currentSkin(){ return DEFAULT_SKINS.find(s=>s.id===selectedSkin)||DEFAULT_SKINS[0]; }
 
   function saveData(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      best: Math.floor(best),
-      coins: Math.floor(totalCoins),
-      ownedSkins,
-      selectedSkin
+      nickname,best:Math.floor(best),coins:Math.floor(totalCoins),
+      ownedSkins,selectedSkin,stats,missionClaims,daily,localRanking
     }));
     ui.best.textContent = Math.floor(best);
     ui.coins.textContent = Math.floor(totalCoins + runCoins);
     ui.shopCoins.textContent = Math.floor(totalCoins);
-  }
-
-  function renderShop(){
-    ui.shopCoins.textContent = Math.floor(totalCoins);
-    ui.shopGrid.innerHTML = '';
-    for(const skin of DEFAULT_SKINS){
-      const owned = ownedSkins.includes(skin.id);
-      const active = selectedSkin === skin.id;
-      const el = document.createElement('div');
-      el.className = 'skin' + (active ? ' active' : '');
-      el.innerHTML = `
-        <div class="name">${skin.name}</div>
-        <div class="meta">Price: ${skin.price} coins</div>
-        <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
-          <div style="width:18px;height:18px;border-radius:50%;background:${skin.body};border:1px solid rgba(255,255,255,.3)"></div>
-          <div style="width:18px;height:18px;border-radius:50%;background:${skin.hood};border:1px solid rgba(255,255,255,.3)"></div>
-          <div style="width:18px;height:18px;border-radius:50%;background:${skin.accent};border:1px solid rgba(255,255,255,.3)"></div>
-        </div>
-      `;
-      const btns = document.createElement('div');
-      btns.className = 'miniBtns';
-      if (!owned) {
-        const buy = document.createElement('button');
-        buy.textContent = totalCoins >= skin.price ? `Buy ${skin.price}` : `Need ${skin.price}`;
-        buy.disabled = totalCoins < skin.price;
-        buy.onclick = () => {
-          if (totalCoins < skin.price) return;
-          totalCoins -= skin.price;
-          ownedSkins.push(skin.id);
-          selectedSkin = skin.id;
-          saveData();
-          renderShop();
-        };
-        btns.appendChild(buy);
-      } else {
-        const use = document.createElement('button');
-        use.textContent = active ? 'Equipped' : 'Equip';
-        use.disabled = active;
-        use.onclick = () => {
-          selectedSkin = skin.id;
-          saveData();
-          renderShop();
-        };
-        btns.appendChild(use);
-      }
-      el.appendChild(btns);
-      ui.shopGrid.appendChild(el);
-    }
-  }
-
-  function openShop(){
-    paused = true;
-    running = false;
-    renderShop();
-    ui.shopOverlay.classList.remove('hidden');
-  }
-  function closeShop(){
-    ui.shopOverlay.classList.add('hidden');
-    if (ui.startOverlay.classList.contains('hidden') && ui.gameOverOverlay.classList.contains('hidden')) {
-      paused = false;
-      running = true;
-      lastTs = 0;
-      requestAnimationFrame(loop);
-    }
+    ui.profileName.textContent = nickname || 'Guest';
+    ui.profileBest.textContent = Math.floor(best);
+    ui.profileCoins.textContent = Math.floor(totalCoins);
+    ui.profileSkin.textContent = currentSkin().name;
+    ui.profileDaily.textContent = canClaimDaily() ? 'Ready' : 'Claimed';
   }
 
   function setMessage(text){ ui.message.textContent = text; }
-
-  function laneX(lane, zScale=1){
-    const spread = Math.min(W*0.19, 165) * zScale;
-    return W*0.5 + lane*spread;
-  }
-
+  function laneX(lane, zScale=1){ const spread=Math.min(W*0.19,165)*zScale; return W*0.5 + lane*spread; }
   function projectZ(z){
-    const near = 110, far = 1800;
-    const t = clamp((z-near)/(far-near), 0, 1);
-    const inv = 1 - t;
-    return { scale: inv, y: lerp(H*0.81, H*0.13, t), alpha: clamp(inv*1.3, 0, 1) };
+    const near=110, far=1800; const t=clamp((z-near)/(far-near),0,1); const inv=1-t;
+    return {scale:inv, y:lerp(H*0.81,H*0.13,t), alpha:clamp(inv*1.3,0,1)};
   }
 
   function randomCarColor(){
-    const colors = ['#3bd16f','#4ab0ff','#ff8e40','#f05a67','#f2d54f','#8d7bff'];
-    return colors[Math.floor(Math.random()*colors.length)];
+    const colors=['#3bd16f','#4ab0ff','#ff8e40','#f05a67','#f2d54f','#8d7bff']; return colors[Math.floor(Math.random()*colors.length)];
   }
-  function makeObstacle(kind, lane, z, color){ return {kind, lane, z, color, passed:false}; }
-  function makeCoinTrail(lane, z, count){
-    const list = [];
-    for(let i=0;i<count;i++) list.push({lane, z:z+i*28, taken:false, spin:rand(0,Math.PI*2)});
-    return list;
+  function makeObstacle(kind,lane,z,color){ return {kind,lane,z,color,passed:false}; }
+  function makeCoinTrail(lane,z,count){
+    const list=[]; for(let i=0;i<count;i++) list.push({lane,z:z+i*28,taken:false,spin:rand(0,Math.PI*2)}); return list;
   }
-  function makeSideProp(z, side){
-    const kinds = ['tree','house','signpost','busstop'];
-    return { z, side, kind:kinds[Math.floor(Math.random()*kinds.length)], color: randomCarColor() };
+  function makeSideProp(z,side){
+    const kinds=['tree','house','signpost','busstop']; return {z,side,kind:kinds[Math.floor(Math.random()*kinds.length)],color:randomCarColor()};
   }
 
   function spawnPattern(startZ){
-    const typeRoll = Math.random();
-    if(typeRoll < 0.22){
-      const safe = Math.floor(rand(0,3));
-      for(let i=0;i<3;i++) if(i!==safe) obstacles.push(makeObstacle('car', lanes[i], startZ + rand(-6,6), randomCarColor()));
-      coinTrail.push(makeCoinTrail(lanes[safe], startZ + 12, 5));
-    } else if(typeRoll < 0.42){
-      const lane = lanes[Math.floor(rand(0,3))];
-      obstacles.push(makeObstacle('signHigh', lane, startZ, '#ff6c5c')); // slide
-      const alt = lane === 0 ? (Math.random()<0.5 ? -1 : 1) : 0;
-      if(Math.random()<0.7) coinTrail.push(makeCoinTrail(alt, startZ + 8, 4));
-    } else if(typeRoll < 0.62){
-      const lane = lanes[Math.floor(rand(0,3))];
-      obstacles.push(makeObstacle('barrierLow', lane, startZ, '#ffbf45')); // jump
-      const safeChoices = lanes.filter(v => v !== lane);
-      coinTrail.push(makeCoinTrail(safeChoices[Math.floor(rand(0,safeChoices.length))], startZ + 14, 5));
-    } else if(typeRoll < 0.8){
-      const lane = lanes[Math.floor(rand(0,3))];
-      coinTrail.push(makeCoinTrail(lane, startZ, 7));
-    } else {
-      const order = [-1,0,1].sort(()=>Math.random()-0.5);
-      obstacles.push(makeObstacle('car', order[0], startZ, randomCarColor()));
-      obstacles.push(makeObstacle('barrierLow', order[1], startZ + 44, '#ffbf45'));
-      obstacles.push(makeObstacle('signHigh', order[2], startZ + 88, '#ff6c5c'));
-      coinTrail.push(makeCoinTrail(order[Math.floor(rand(0,3))], startZ + 18, 4));
+    const r=Math.random();
+    if(r<0.22){
+      const safe=Math.floor(rand(0,3));
+      for(let i=0;i<3;i++) if(i!==safe) obstacles.push(makeObstacle('car',lanes[i],startZ+rand(-6,6),randomCarColor()));
+      coinTrail.push(makeCoinTrail(lanes[safe],startZ+12,5));
+    }else if(r<0.42){
+      const lane=lanes[Math.floor(rand(0,3))];
+      obstacles.push(makeObstacle('signHigh',lane,startZ,'#ff6c5c'));
+      const alt=lane===0?(Math.random()<0.5?-1:1):0;
+      if(Math.random()<0.7) coinTrail.push(makeCoinTrail(alt,startZ+8,4));
+    }else if(r<0.62){
+      const lane=lanes[Math.floor(rand(0,3))];
+      obstacles.push(makeObstacle('barrierLow',lane,startZ,'#ffbf45'));
+      const safeChoices=lanes.filter(v=>v!==lane);
+      coinTrail.push(makeCoinTrail(safeChoices[Math.floor(rand(0,safeChoices.length))],startZ+14,5));
+    }else if(r<0.8){
+      const lane=lanes[Math.floor(rand(0,3))];
+      coinTrail.push(makeCoinTrail(lane,startZ,7));
+    }else{
+      const order=[-1,0,1].sort(()=>Math.random()-0.5);
+      obstacles.push(makeObstacle('car',order[0],startZ,randomCarColor()));
+      obstacles.push(makeObstacle('barrierLow',order[1],startZ+44,'#ffbf45'));
+      obstacles.push(makeObstacle('signHigh',order[2],startZ+88,'#ff6c5c'));
+      coinTrail.push(makeCoinTrail(order[Math.floor(rand(0,3))],startZ+18,4));
     }
     if(Math.random()<0.92){
-      sideProps.push(makeSideProp(startZ + rand(-10,30), -1));
-      sideProps.push(makeSideProp(startZ + rand(-10,30), 1));
+      sideProps.push(makeSideProp(startZ+rand(-10,30),-1));
+      sideProps.push(makeSideProp(startZ+rand(-10,30),1));
     }
   }
 
@@ -362,21 +396,39 @@
     score=0; runCoins=0; speed=1; distance=0; roadOffset=0; shake=0; flash=0;
     running=false; paused=false; gameOver=false; lastTs=0;
     obstacles=[]; particles=[]; sideProps=[]; coinTrail=[];
-    state.player.lane=0; state.player.x=W*0.5; state.player.bob=0; state.player.step=0; state.player.lean=0;
-    state.player.jumpY=0; state.player.jumpV=0; state.player.jumping=false; state.player.sliding=false; state.player.slideTimer=0; state.player.lanePulse=0;
-
-    clouds = Array.from({length:8}, (_,i)=>({ x:(i/8)*W + rand(-80,80), y:rand(30,H*0.24), s:rand(.8,1.6), sp:rand(4,11)}));
-    let z = 320;
-    while(obstacles.length < 30){ spawnPattern(z); z += rand(110,210); }
+    Object.assign(state.player,{lane:0,x:W*0.5,bob:0,step:0,lean:0,jumpY:0,jumpV:0,jumping:false,sliding:false,slideTimer:0,lanePulse:0});
+    clouds = Array.from({length:8}, (_,i)=>({x:(i/8)*W+rand(-80,80), y:rand(30,H*0.24), s:rand(.8,1.6), sp:rand(4,11)}));
+    let z=320; while(obstacles.length<30){ spawnPattern(z); z+=rand(110,210); }
     updateHud();
   }
 
+  function updateLocalRanking(){
+    const entry = {name:nickname || 'Guest', best:Math.floor(best)};
+    const idx = localRanking.findIndex(v => v.name.toLowerCase() === entry.name.toLowerCase());
+    if(idx >= 0) localRanking[idx] = entry;
+    else localRanking.push(entry);
+    localRanking.sort((a,b)=>b.best-a.best || a.name.localeCompare(b.name));
+    localRanking = localRanking.slice(0,30);
+  }
+
+  function completeMissionRewards(){
+    for(const m of MISSION_DEFS){
+      if(missionClaims[m.id]) continue;
+      const value = stats[m.type] || 0;
+      if(value >= m.target){
+        missionClaims[m.id] = True = true;
+        totalCoins += m.reward;
+      }
+    }
+  }
+
   function startGame(){
+    nickname = (ui.nicknameInput.value || 'Guest').trim().slice(0,18) || 'Guest';
+    saveData();
     resetWorld();
     running=true;
-    ui.startOverlay.classList.add('hidden');
+    ui.lobbyOverlay.classList.add('hidden');
     ui.gameOverOverlay.classList.add('hidden');
-    ui.shopOverlay.classList.add('hidden');
     setMessage('Move lanes · jump barriers · slide under signs');
     requestAnimationFrame(loop);
   }
@@ -384,8 +436,16 @@
   function endGame(){
     running=false; gameOver=true;
     best = Math.max(best, Math.floor(score));
+    stats.bestScore = Math.max(stats.bestScore || 0, Math.floor(score));
+    stats.runsTotal += 1;
+    stats.coinsTotal += Math.floor(runCoins);
     totalCoins += runCoins;
+    completeMissionRewards();
+    updateLocalRanking();
     saveData();
+    renderMissions();
+    renderDaily();
+    renderRanking();
     ui.gameOverText.textContent = `Score ${Math.floor(score)} · Coins +${Math.floor(runCoins)} · Total Coins ${Math.floor(totalCoins)}`;
     ui.gameOverOverlay.classList.remove('hidden');
     setMessage('Run complete');
@@ -397,76 +457,75 @@
     state.player.lanePulse = 1;
   }
   function jump(){
-    const p = state.player;
-    if(!running || paused || gameOver) return;
-    if(p.jumping || p.sliding) return;
-    p.jumping = true; p.jumpV = -720;
-    setMessage('Jump');
+    const p=state.player; if(!running || paused || gameOver || p.jumping || p.sliding) return;
+    p.jumping=true; p.jumpV=-720; stats.jumpTotal += 1; setMessage('Jump');
   }
   function slide(){
-    const p = state.player;
-    if(!running || paused || gameOver) return;
-    if(p.jumping || p.sliding) return;
-    p.sliding = true; p.slideTimer = .65;
-    setMessage('Slide');
+    const p=state.player; if(!running || paused || gameOver || p.jumping || p.sliding) return;
+    p.sliding=true; p.slideTimer=.65; stats.slideTotal += 1; setMessage('Slide');
   }
 
   function burst(x,y,color,count=12){
     for(let i=0;i<count;i++){
-      const a = rand(-Math.PI, Math.PI);
-      const sp = rand(20,180);
+      const a=rand(-Math.PI,Math.PI), sp=rand(20,180);
       particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-30,g:110,size:rand(2,7),life:rand(.35,.9),maxLife:rand(.35,.9),color});
     }
   }
   function collectCoin(x,y){ runCoins += 1; burst(x,y,'#ffd85e',10); }
   function crash(x,y){ shake=16; flash=1; burst(x,y,'#ffffff',16); burst(x,y,'#ff6c5c',12); }
 
+  function playerCollisionState(){
+    const p = state.player;
+    return {
+      lane:p.lane,
+      jumping:p.jumping && p.jumpY < -38,
+      sliding:p.sliding,
+    };
+  }
+
   function update(dt){
     if(!running || paused || gameOver) return;
-
     speed += dt * 0.02;
     score += dt * 18 * speed;
     distance += dt * 360 * speed;
     roadOffset += dt * 900 * speed;
 
-    const p = state.player;
+    const p=state.player;
     p.bob += dt * 7.5 * speed;
     p.step += dt * 13 * speed;
     p.lanePulse = Math.max(0, p.lanePulse - dt*4);
     if(p.jumping){
       p.jumpV += 1800 * dt;
       p.jumpY += p.jumpV * dt;
-      if(p.jumpY >= 0){ p.jumpY = 0; p.jumpV = 0; p.jumping = false; }
+      if(p.jumpY >= 0){ p.jumpY=0; p.jumpV=0; p.jumping=false; }
     }
     if(p.sliding){
       p.slideTimer -= dt;
       if(p.slideTimer <= 0){ p.slideTimer = 0; p.sliding = false; }
     }
+    const targetX=laneX(p.lane,1);
+    p.x = lerp(p.x,targetX,clamp(dt*11,0,1));
+    p.lean = lerp(p.lean,(targetX-p.x)*0.02,clamp(dt*8,0,1));
 
-    const targetX = laneX(p.lane, 1);
-    p.x = lerp(p.x, targetX, clamp(dt*11, 0, 1));
-    p.lean = lerp(p.lean, (targetX - p.x) * 0.02, clamp(dt*8,0,1));
+    for(const c of clouds){ c.x -= c.sp*dt*6; if(c.x<-200) c.x=W+rand(20,120); }
 
-    for(const c of clouds){
-      c.x -= c.sp * dt * 6;
-      if(c.x < -200) c.x = W + rand(20,120);
-    }
+    const cState = playerCollisionState();
 
     for(const obj of obstacles){
       obj.z -= dt * 360 * speed;
       if(!obj.passed && obj.z < 52){
         obj.passed = true;
-        if(obj.lane === p.lane){
-          let safe = false;
-          if(obj.kind === 'barrierLow') safe = p.jumping && p.jumpY < -38;
-          else if(obj.kind === 'signHigh') safe = p.sliding;
+        if(obj.lane === cState.lane){
+          let safe=false;
+          if(obj.kind==='barrierLow') safe = cState.jumping;
+          else if(obj.kind==='signHigh') safe = cState.sliding;
           else safe = false;
           if(!safe){
-            crash(p.x, p.y - 10 + p.jumpY);
+            crash(p.x,p.y-10+p.jumpY);
             endGame();
             return;
-          } else {
-            burst(p.x, p.y - 16 + p.jumpY, '#86ff7d', 10);
+          }else{
+            burst(p.x,p.y-16+p.jumpY,'#86ff7d',10);
           }
         }
       }
@@ -474,140 +533,127 @@
 
     for(const trail of coinTrail){
       for(const coin of trail){
-        coin.z -= dt * 360 * speed;
-        coin.spin += dt * 8;
+        coin.z -= dt * 360 * speed; coin.spin += dt * 8;
         if(!coin.taken && coin.z < 50 && coin.lane === p.lane){
           const collectAllowed = !p.sliding || p.jumpY === 0;
-          if(collectAllowed){
-            coin.taken = true;
-            collectCoin(p.x, p.y - 60 + p.jumpY);
-          }
+          if(collectAllowed){ coin.taken=true; collectCoin(p.x,p.y-60+p.jumpY); }
         }
       }
     }
-
     for(const prop of sideProps) prop.z -= dt * 360 * speed;
 
     while(obstacles.length && obstacles[0].z < -180) obstacles.shift();
     while(sideProps.length && sideProps[0].z < -220) sideProps.shift();
     while(coinTrail.length && coinTrail[0].every(c => c.z < -50 || c.taken)) coinTrail.shift();
 
-    let maxZ = 300;
-    if(obstacles.length) maxZ = Math.max(maxZ, ...obstacles.map(v => v.z));
+    let maxZ=300; if(obstacles.length) maxZ=Math.max(maxZ,...obstacles.map(v=>v.z));
     while(maxZ < 1800){ maxZ += rand(120,220); spawnPattern(maxZ); }
 
     for(let i=particles.length-1;i>=0;i--){
-      const pr = particles[i];
+      const pr=particles[i];
       pr.x += pr.vx*dt; pr.y += pr.vy*dt; pr.vy += pr.g*dt; pr.life -= dt;
       if(pr.life <= 0) particles.splice(i,1);
     }
-
     shake = Math.max(0, shake - dt*24);
     flash = Math.max(0, flash - dt*2.2);
     updateHud();
   }
 
   function updateHud(){
-    ui.score.textContent = Math.floor(score);
-    ui.best.textContent = Math.floor(best);
-    ui.coins.textContent = Math.floor(totalCoins + runCoins);
-    ui.speed.textContent = speed.toFixed(1);
+    ui.score.textContent=Math.floor(score);
+    ui.best.textContent=Math.floor(best);
+    ui.coins.textContent=Math.floor(totalCoins + runCoins);
+    ui.speed.textContent=speed.toFixed(1);
     ui.pauseBtn.textContent = paused ? 'Resume' : 'Pause';
   }
 
   function drawSky(){
-    const sky = ctx.createLinearGradient(0,0,0,H);
+    const sky=ctx.createLinearGradient(0,0,0,H);
     sky.addColorStop(0,'#74c5ff'); sky.addColorStop(.45,'#9eddff'); sky.addColorStop(.46,'#d9f3ff'); sky.addColorStop(1,'#f3e5bf');
-    ctx.fillStyle = sky; ctx.fillRect(0,0,W,H);
-    ctx.fillStyle = 'rgba(255,255,255,.86)';
-    for(const c of clouds) drawCloud(c.x, c.y, c.s);
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='rgba(255,255,255,.86)';
+    for(const c of clouds) drawCloud(c.x,c.y,c.s);
   }
   function drawCloud(x,y,s){
-    ctx.beginPath();
-    ctx.arc(x, y, 22*s, 0, Math.PI*2);
-    ctx.arc(x+22*s, y-8*s, 20*s, 0, Math.PI*2);
-    ctx.arc(x+48*s, y, 24*s, 0, Math.PI*2);
-    ctx.arc(x+20*s, y+12*s, 22*s, 0, Math.PI*2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(x,y,22*s,0,Math.PI*2); ctx.arc(x+22*s,y-8*s,20*s,0,Math.PI*2); ctx.arc(x+48*s,y,24*s,0,Math.PI*2); ctx.arc(x+20*s,y+12*s,22*s,0,Math.PI*2); ctx.fill();
   }
 
   function drawCity(){
-    const horizon = H*0.34;
-    ctx.fillStyle = '#e3d6b4'; ctx.fillRect(0,horizon,W,H-horizon);
+    const horizon=H*0.34;
+    ctx.fillStyle='#e3d6b4'; ctx.fillRect(0,horizon,W,H-horizon);
     for(let i=0;i<13;i++){
-      const w = W/12; const x = i*w - (distance*0.05 % w);
-      const h1 = 80 + ((i*57)%140), h2 = 60 + ((i*83)%120);
-      drawBuilding(x, horizon-h1, w*0.92, h1, i%2===0 ? '#c9d8ef' : '#f7d1d8');
-      drawBuilding(x+w*0.36, horizon-h2, w*0.66, h2, i%2===0 ? '#d9f3ff' : '#e9dcff');
+      const w=W/12, x=i*w - (distance*0.05 % w), h1=80+((i*57)%140), h2=60+((i*83)%120);
+      drawBuilding(x,horizon-h1,w*0.92,h1,i%2===0?'#c9d8ef':'#f7d1d8');
+      drawBuilding(x+w*0.36,horizon-h2,w*0.66,h2,i%2===0?'#d9f3ff':'#e9dcff');
     }
   }
   function drawBuilding(x,y,w,h,color){
-    ctx.fillStyle = color; roundRectFill(x,y,w,h,14);
-    ctx.fillStyle = 'rgba(255,255,255,.48)';
+    ctx.fillStyle=color; roundRectFill(x,y,w,h,14);
+    ctx.fillStyle='rgba(255,255,255,.48)';
     for(let r=0;r<4;r++) for(let c=0;c<3;c++) ctx.fillRect(x+12+c*(w-24)/3, y+14+r*(h-20)/5, 8, 10);
   }
 
   function drawRoad(){
-    const topY = H*0.36, bottomY = H, cx = W*0.5, topW = W*0.14, bottomW = W*0.94;
-    ctx.fillStyle = '#54525b';
-    ctx.beginPath(); ctx.moveTo(cx-topW/2, topY); ctx.lineTo(cx+topW/2, topY); ctx.lineTo(cx+bottomW/2, bottomY); ctx.lineTo(cx-bottomW/2, bottomY); ctx.closePath(); ctx.fill();
-    const curb = ctx.createLinearGradient(0,topY,0,bottomY); curb.addColorStop(0,'#f7e5bf'); curb.addColorStop(1,'#ccb78d');
-    ctx.fillStyle = curb;
-    ctx.beginPath(); ctx.moveTo(cx-topW/2-18, topY); ctx.lineTo(cx-topW/2, topY); ctx.lineTo(cx-bottomW/2, bottomY); ctx.lineTo(cx-bottomW/2-24, bottomY); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(cx+topW/2+18, topY); ctx.lineTo(cx+topW/2, topY); ctx.lineTo(cx+bottomW/2, bottomY); ctx.lineTo(cx+bottomW/2+24, bottomY); ctx.closePath(); ctx.fill();
+    const topY=H*0.36, bottomY=H, cx=W*0.5, topW=W*0.14, bottomW=W*0.94;
+    ctx.fillStyle='#54525b';
+    ctx.beginPath(); ctx.moveTo(cx-topW/2,topY); ctx.lineTo(cx+topW/2,topY); ctx.lineTo(cx+bottomW/2,bottomY); ctx.lineTo(cx-bottomW/2,bottomY); ctx.closePath(); ctx.fill();
+    const curb=ctx.createLinearGradient(0,topY,0,bottomY); curb.addColorStop(0,'#f7e5bf'); curb.addColorStop(1,'#ccb78d');
+    ctx.fillStyle=curb;
+    ctx.beginPath(); ctx.moveTo(cx-topW/2-18,topY); ctx.lineTo(cx-topW/2,topY); ctx.lineTo(cx-bottomW/2,bottomY); ctx.lineTo(cx-bottomW/2-24,bottomY); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(cx+topW/2+18,topY); ctx.lineTo(cx+topW/2,topY); ctx.lineTo(cx+bottomW/2,bottomY); ctx.lineTo(cx+bottomW/2+24,bottomY); ctx.closePath(); ctx.fill();
     for(let i=0;i<24;i++){
-      const t = ((roadOffset*0.0018)+i/24)%1;
-      const y = lerp(topY+18, bottomY+80, t), leng = lerp(22,110,t), sw = lerp(2,10,t), mid = lerp(topW*0.16, bottomW*0.16, t);
-      ctx.fillStyle = 'rgba(255,255,255,.92)';
-      ctx.fillRect(cx-mid-sw/2, y, sw, leng); ctx.fillRect(cx+mid-sw/2, y, sw, leng);
+      const t=((roadOffset*0.0018)+i/24)%1;
+      const y=lerp(topY+18,bottomY+80,t), len=lerp(22,110,t), sw=lerp(2,10,t), mid=lerp(topW*0.16,bottomW*0.16,t);
+      ctx.fillStyle='rgba(255,255,255,.92)';
+      ctx.fillRect(cx-mid-sw/2,y,sw,len); ctx.fillRect(cx+mid-sw/2,y,sw,len);
     }
   }
 
   function drawProps(){
     for(const prop of [...sideProps].sort((a,b)=>b.z-a.z)){
-      const p = projectZ(prop.z); if(p.scale <= 0.02) continue;
-      const edgeX = prop.side < 0 ? lerp(W*0.44, W*0.02, p.scale) : lerp(W*0.56, W*0.98, p.scale);
-      const baseY = p.y + 55*p.scale;
-      ctx.save(); ctx.globalAlpha = p.alpha;
-      if(prop.kind === 'tree') drawTree(edgeX, baseY, p.scale*1.2);
-      else if(prop.kind === 'house') drawHouse(edgeX, baseY, p.scale*1.15, prop.color);
-      else if(prop.kind === 'signpost') drawSignpost(edgeX, baseY, p.scale*1.1);
-      else drawBusStop(edgeX, baseY, p.scale*1.15);
+      const p=projectZ(prop.z); if(p.scale<=0.02) continue;
+      const edgeX=prop.side<0?lerp(W*0.44,W*0.02,p.scale):lerp(W*0.56,W*0.98,p.scale);
+      const baseY=p.y+55*p.scale;
+      ctx.save(); ctx.globalAlpha=p.alpha;
+      if(prop.kind==='tree') drawTree(edgeX,baseY,p.scale*1.2);
+      else if(prop.kind==='house') drawHouse(edgeX,baseY,p.scale*1.15,prop.color);
+      else if(prop.kind==='signpost') drawSignpost(edgeX,baseY,p.scale*1.1);
+      else drawBusStop(edgeX,baseY,p.scale*1.15);
       ctx.restore();
     }
   }
   function drawTree(x,y,s){
-    ctx.fillStyle = '#8b6a44'; ctx.fillRect(x-6*s, y-24*s, 12*s, 28*s);
-    ctx.fillStyle = '#5fd85d'; ctx.beginPath(); ctx.arc(x, y-34*s, 26*s, 0, Math.PI*2); ctx.arc(x-18*s, y-28*s, 19*s, 0, Math.PI*2); ctx.arc(x+18*s, y-28*s, 19*s, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle='#8b6a44'; ctx.fillRect(x-6*s,y-24*s,12*s,28*s);
+    ctx.fillStyle='#5fd85d'; ctx.beginPath(); ctx.arc(x,y-34*s,26*s,0,Math.PI*2); ctx.arc(x-18*s,y-28*s,19*s,0,Math.PI*2); ctx.arc(x+18*s,y-28*s,19*s,0,Math.PI*2); ctx.fill();
   }
   function drawHouse(x,y,s,color){
-    ctx.fillStyle = color; roundRectFill(x-28*s, y-32*s, 56*s, 42*s, 8*s);
-    ctx.fillStyle = '#ff704f'; ctx.beginPath(); ctx.moveTo(x-34*s, y-32*s); ctx.lineTo(x, y-58*s); ctx.lineTo(x+34*s, y-32*s); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#d9f3ff'; ctx.fillRect(x-14*s, y-16*s, 12*s, 12*s); ctx.fillRect(x+4*s, y-16*s, 12*s, 12*s);
+    ctx.fillStyle=color; roundRectFill(x-28*s,y-32*s,56*s,42*s,8*s);
+    ctx.fillStyle='#ff704f'; ctx.beginPath(); ctx.moveTo(x-34*s,y-32*s); ctx.lineTo(x,y-58*s); ctx.lineTo(x+34*s,y-32*s); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#d9f3ff'; ctx.fillRect(x-14*s,y-16*s,12*s,12*s); ctx.fillRect(x+4*s,y-16*s,12*s,12*s);
   }
   function drawSignpost(x,y,s){
-    ctx.fillStyle = '#7b7f8f'; ctx.fillRect(x-4*s, y-40*s, 8*s, 44*s);
-    ctx.fillStyle = '#ff6558'; roundRectFill(x-22*s, y-72*s, 44*s, 24*s, 6*s);
-    ctx.fillStyle = '#ffffff'; ctx.fillRect(x-14*s, y-62*s, 28*s, 4*s);
+    ctx.fillStyle='#7b7f8f'; ctx.fillRect(x-4*s,y-40*s,8*s,44*s);
+    ctx.fillStyle='#ff6558'; roundRectFill(x-22*s,y-72*s,44*s,24*s,6*s);
+    ctx.fillStyle='#ffffff'; ctx.fillRect(x-14*s,y-62*s,28*s,4*s);
   }
   function drawBusStop(x,y,s){
-    ctx.fillStyle = '#cfe7ff'; roundRectFill(x-24*s, y-54*s, 48*s, 50*s, 8*s);
-    ctx.fillStyle = '#6caeff'; ctx.fillRect(x-18*s, y-46*s, 36*s, 16*s);
-    ctx.fillStyle = '#7c8ca6'; ctx.fillRect(x-22*s, y-58*s, 44*s, 6*s);
+    ctx.fillStyle='#cfe7ff'; roundRectFill(x-24*s,y-54*s,48*s,50*s,8*s);
+    ctx.fillStyle='#6caeff'; ctx.fillRect(x-18*s,y-46*s,36*s,16*s);
+    ctx.fillStyle='#7c8ca6'; ctx.fillRect(x-22*s,y-58*s,44*s,6*s);
   }
 
   function drawCoins(){
     for(const trail of coinTrail){
       for(const coin of trail){
         if(coin.taken) continue;
-        const p = projectZ(coin.z); if(p.scale <= 0.02) continue;
-        const x = laneX(coin.lane, p.scale), y = p.y - 16*p.scale;
-        ctx.save(); ctx.globalAlpha = p.alpha; ctx.translate(x,y);
-        const squash = Math.abs(Math.cos(coin.spin)) * (18*p.scale) + 2;
-        ctx.shadowBlur = 18*p.scale + 4; ctx.shadowColor = '#ffd85e';
-        ctx.fillStyle = '#ffd85e'; ctx.beginPath(); ctx.ellipse(0,0,squash,22*p.scale,0,0,Math.PI*2); ctx.fill();
-        ctx.shadowBlur = 0; ctx.strokeStyle = '#f0b826'; ctx.lineWidth = Math.max(1,2.5*p.scale); ctx.beginPath(); ctx.ellipse(0,0,squash,22*p.scale,0,0,Math.PI*2); ctx.stroke();
-        ctx.fillStyle = '#f09513'; ctx.font = `${Math.max(7, 18*p.scale)}px Inter, Arial`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('C',0,1);
+        const p=projectZ(coin.z); if(p.scale<=0.02) continue;
+        const x=laneX(coin.lane,p.scale), y=p.y-16*p.scale;
+        ctx.save(); ctx.globalAlpha=p.alpha; ctx.translate(x,y);
+        const squash=Math.abs(Math.cos(coin.spin))*(18*p.scale)+2;
+        ctx.shadowBlur=18*p.scale+4; ctx.shadowColor='#ffd85e';
+        ctx.fillStyle='#ffd85e'; ctx.beginPath(); ctx.ellipse(0,0,squash,22*p.scale,0,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; ctx.strokeStyle='#f0b826'; ctx.lineWidth=Math.max(1,2.5*p.scale); ctx.beginPath(); ctx.ellipse(0,0,squash,22*p.scale,0,0,Math.PI*2); ctx.stroke();
+        ctx.fillStyle='#f09513'; ctx.font=`${Math.max(7,18*p.scale)}px Inter, Arial`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('C',0,1);
         ctx.restore();
       }
     }
@@ -615,11 +661,11 @@
 
   function drawObstacles(){
     for(const obj of [...obstacles].sort((a,b)=>b.z-a.z)){
-      const p = projectZ(obj.z); if(p.scale <= 0.02) continue;
-      const x = laneX(obj.lane, p.scale), y = p.y + 18*p.scale;
-      ctx.save(); ctx.globalAlpha = p.alpha;
-      if(obj.kind === 'car') drawCar(x,y,p.scale*1.25,obj.color);
-      else if(obj.kind === 'signHigh') drawStopSignObstacle(x,y,p.scale*1.25);
+      const p=projectZ(obj.z); if(p.scale<=0.02) continue;
+      const x=laneX(obj.lane,p.scale), y=p.y+18*p.scale;
+      ctx.save(); ctx.globalAlpha=p.alpha;
+      if(obj.kind==='car') drawCar(x,y,p.scale*1.25,obj.color);
+      else if(obj.kind==='signHigh') drawStopSignObstacle(x,y,p.scale*1.25);
       else drawBarrier(x,y,p.scale*1.2);
       ctx.restore();
     }
@@ -627,149 +673,235 @@
   function drawCar(x,y,s,color){
     const w=78*s,h=58*s;
     ctx.fillStyle='rgba(0,0,0,.16)'; ctx.beginPath(); ctx.ellipse(x,y+10*s,w*.45,h*.16,0,0,Math.PI*2); ctx.fill();
-    const g=ctx.createLinearGradient(x,y-h/2,x,y+h/2); g.addColorStop(0, lighten(color,28)); g.addColorStop(.45,color); g.addColorStop(1,darken(color,28));
-    ctx.fillStyle=g; roundRectFill(x-w/2, y-h*.18, w, h*.52, 14*s);
-    ctx.fillStyle=lighten(color,22); roundRectFill(x-w*.26, y-h*.48, w*.52, h*.38, 10*s);
-    ctx.fillStyle='#d9f3ff'; roundRectFill(x-w*.20, y-h*.42, w*.18, h*.22, 5*s); roundRectFill(x+w*.02, y-h*.42, w*.18, h*.22, 5*s);
-    ctx.fillStyle='#f4f8ff'; roundRectFill(x-w*.32, y+h*.12, w*.64, h*.10, 4*s);
-    ctx.fillStyle='#fff4a0'; roundRectFill(x-w*.28, y+h*.08, w*.10, h*.06, 4*s); roundRectFill(x+w*.18, y+h*.08, w*.10, h*.06, 4*s);
-    ctx.fillStyle='#172236'; ctx.beginPath(); ctx.arc(x-w*.27, y+h*.28, 9*s, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(x+w*.27, y+h*.28, 9*s, 0, Math.PI*2); ctx.fill();
+    const g=ctx.createLinearGradient(x,y-h/2,x,y+h/2); g.addColorStop(0,lighten(color,28)); g.addColorStop(.45,color); g.addColorStop(1,darken(color,28));
+    ctx.fillStyle=g; roundRectFill(x-w/2,y-h*.18,w,h*.52,14*s);
+    ctx.fillStyle=lighten(color,22); roundRectFill(x-w*.26,y-h*.48,w*.52,h*.38,10*s);
+    ctx.fillStyle='#d9f3ff'; roundRectFill(x-w*.20,y-h*.42,w*.18,h*.22,5*s); roundRectFill(x+w*.02,y-h*.42,w*.18,h*.22,5*s);
+    ctx.fillStyle='#f4f8ff'; roundRectFill(x-w*.32,y+h*.12,w*.64,h*.10,4*s);
+    ctx.fillStyle='#fff4a0'; roundRectFill(x-w*.28,y+h*.08,w*.10,h*.06,4*s); roundRectFill(x+w*.18,y+h*.08,w*.10,h*.06,4*s);
+    ctx.fillStyle='#172236'; ctx.beginPath(); ctx.arc(x-w*.27,y+h*.28,9*s,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(x+w*.27,y+h*.28,9*s,0,Math.PI*2); ctx.fill();
   }
   function drawStopSignObstacle(x,y,s){
-    ctx.fillStyle='#7c8191'; ctx.fillRect(x-5*s, y-48*s, 10*s, 52*s);
-    ctx.fillStyle='#ff6657'; polygon(x, y-68*s, 22*s, 8, Math.PI/8); ctx.fill();
-    ctx.fillStyle='#ffffff'; ctx.font=`${Math.max(8, 12*s)}px Inter, Arial`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('STOP', x, y-68*s+1);
+    ctx.fillStyle='#7c8191'; ctx.fillRect(x-5*s,y-48*s,10*s,52*s);
+    polygon(x,y-68*s,22*s,8,Math.PI/8); ctx.fillStyle='#ff6657'; ctx.fill();
+    ctx.fillStyle='#ffffff'; ctx.font=`${Math.max(8,12*s)}px Inter, Arial`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('STOP',x,y-68*s+1);
   }
   function drawBarrier(x,y,s){
-    ctx.fillStyle='#7c8191'; ctx.fillRect(x-6*s, y-30*s, 12*s, 35*s);
-    const g=ctx.createLinearGradient(x, y-52*s, x, y-12*s); g.addColorStop(0,'#fff3a0'); g.addColorStop(1,'#ffbf45'); ctx.fillStyle=g; roundRectFill(x-28*s, y-58*s, 56*s, 32*s, 8*s);
-    ctx.fillStyle='#ffffff'; ctx.fillRect(x-20*s, y-50*s, 40*s, 5*s);
+    ctx.fillStyle='#7c8191'; ctx.fillRect(x-6*s,y-30*s,12*s,35*s);
+    const g=ctx.createLinearGradient(x,y-52*s,x,y-12*s); g.addColorStop(0,'#fff3a0'); g.addColorStop(1,'#ffbf45'); ctx.fillStyle=g; roundRectFill(x-28*s,y-58*s,56*s,32*s,8*s);
+    ctx.fillStyle='#ffffff'; ctx.fillRect(x-20*s,y-50*s,40*s,5*s);
   }
   function polygon(x,y,r,sides,rot=0){
-    ctx.beginPath();
-    for(let i=0;i<sides;i++){ const a=rot + Math.PI*2*i/sides; const px=x+Math.cos(a)*r; const py=y+Math.sin(a)*r; if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);}
-    ctx.closePath();
+    ctx.beginPath(); for(let i=0;i<sides;i++){ const a=rot + Math.PI*2*i/sides; const px=x+Math.cos(a)*r; const py=y+Math.sin(a)*r; if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);} ctx.closePath();
   }
 
   function drawRunner(){
-    const p = state.player, skin = currentSkin();
-    const x = p.x + (Math.random()-.5)*shake;
-    const y = p.y + Math.sin(p.bob)*4 + p.jumpY;
-    const s = Math.min(W,H) / 900;
+    const p=state.player, skin=currentSkin();
+    const x=p.x + (Math.random()-.5)*shake, y=p.y + Math.sin(p.bob)*4 + p.jumpY, s=Math.min(W,H)/900;
     ctx.save(); ctx.translate(x,y); ctx.rotate(p.lean);
-
-    const slideMul = p.sliding ? .58 : 1;
-    const bodyYOffset = p.sliding ? 16*s : 0;
-
-    ctx.fillStyle='rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(0, 20*s, 34*s, 10*s, 0, 0, Math.PI*2); ctx.fill();
-
-    const runA = Math.sin(p.step)*0.9;
-    const runB = Math.sin(p.step + Math.PI)*0.9;
-    drawLeg(-9*s, 6*s + bodyYOffset, runA, s, p.sliding);
-    drawLeg(9*s, 6*s + bodyYOffset, runB, s, p.sliding);
-
-    const bodyGrad = ctx.createLinearGradient(0,-42*s,0,18*s);
-    bodyGrad.addColorStop(0, lighten(skin.body, 24)); bodyGrad.addColorStop(1, skin.body);
-    ctx.fillStyle = bodyGrad; roundRectFill(-18*s,-42*s*slideMul + bodyYOffset, 36*s, 48*s*slideMul, 12*s);
-
-    ctx.fillStyle = skin.hood;
-    ctx.beginPath();
-    ctx.arc(0,-30*s*slideMul + bodyYOffset,18*s,Math.PI,0);
-    ctx.lineTo(14*s,-16*s*slideMul + bodyYOffset); ctx.lineTo(-14*s,-16*s*slideMul + bodyYOffset); ctx.closePath(); ctx.fill();
-
-    ctx.fillStyle = '#ffd3b3'; ctx.beginPath(); ctx.arc(0,-28*s*slideMul + bodyYOffset,13.5*s,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#b84f21'; ctx.beginPath(); ctx.arc(-2*s,-31*s*slideMul + bodyYOffset,13*s,Math.PI,Math.PI*2); ctx.lineTo(10*s,-28*s*slideMul + bodyYOffset); ctx.lineTo(-11*s,-20*s*slideMul + bodyYOffset); ctx.closePath(); ctx.fill();
-
-    ctx.fillStyle='#17304d'; ctx.beginPath(); ctx.arc(-4*s,-29*s*slideMul + bodyYOffset,1.3*s,0,Math.PI*2); ctx.arc(4*s,-29*s*slideMul + bodyYOffset,1.3*s,0,Math.PI*2); ctx.fill();
-
-    drawArm(-17*s,-20*s*slideMul + bodyYOffset, runB*.8, s, p.sliding, skin.body);
-    drawArm(17*s,-20*s*slideMul + bodyYOffset, runA*.8, s, p.sliding, skin.body);
-
-    ctx.fillStyle = skin.shorts; roundRectFill(-17*s,0*slideMul + bodyYOffset,34*s,20*s*slideMul,6*s);
-    ctx.fillStyle = '#2c4b75'; ctx.fillRect(-10*s,20*s*slideMul + bodyYOffset,7*s,10*s*slideMul); ctx.fillRect(3*s,20*s*slideMul + bodyYOffset,7*s,10*s*slideMul);
-    ctx.fillStyle = skin.accent; ctx.fillRect(-10*s,24*s*slideMul + bodyYOffset,7*s,3*s); ctx.fillRect(3*s,24*s*slideMul + bodyYOffset,7*s,3*s);
-
-    drawShoe(-8*s, 32*s*slideMul + bodyYOffset + Math.sin(p.step)*2*s, s);
-    drawShoe(8*s, 32*s*slideMul + bodyYOffset + Math.sin(p.step + Math.PI)*2*s, s);
-
-    if(p.lanePulse > 0){
-      ctx.strokeStyle = `rgba(255,80,190,${p.lanePulse*.45})`; ctx.lineWidth = 6*s;
-      ctx.beginPath(); ctx.arc(0,-6*s + bodyYOffset, 28*s + (1-p.lanePulse)*18*s, 0, Math.PI*2); ctx.stroke();
-    }
+    const slideMul=p.sliding?.58:1, bodyYOffset=p.sliding?16*s:0;
+    ctx.fillStyle='rgba(0,0,0,.18)'; ctx.beginPath(); ctx.ellipse(0,20*s,34*s,10*s,0,0,Math.PI*2); ctx.fill();
+    const runA=Math.sin(p.step)*0.9, runB=Math.sin(p.step+Math.PI)*0.9;
+    drawLeg(-9*s,6*s+bodyYOffset,runA,s,p.sliding); drawLeg(9*s,6*s+bodyYOffset,runB,s,p.sliding);
+    const bodyGrad=ctx.createLinearGradient(0,-42*s,0,18*s); bodyGrad.addColorStop(0,lighten(skin.body,24)); bodyGrad.addColorStop(1,skin.body);
+    ctx.fillStyle=bodyGrad; roundRectFill(-18*s,-42*s*slideMul+bodyYOffset,36*s,48*s*slideMul,12*s);
+    ctx.fillStyle=skin.hood; ctx.beginPath(); ctx.arc(0,-30*s*slideMul+bodyYOffset,18*s,Math.PI,0); ctx.lineTo(14*s,-16*s*slideMul+bodyYOffset); ctx.lineTo(-14*s,-16*s*slideMul+bodyYOffset); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#ffd3b3'; ctx.beginPath(); ctx.arc(0,-28*s*slideMul+bodyYOffset,13.5*s,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#b84f21'; ctx.beginPath(); ctx.arc(-2*s,-31*s*slideMul+bodyYOffset,13*s,Math.PI,Math.PI*2); ctx.lineTo(10*s,-28*s*slideMul+bodyYOffset); ctx.lineTo(-11*s,-20*s*slideMul+bodyYOffset); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#17304d'; ctx.beginPath(); ctx.arc(-4*s,-29*s*slideMul+bodyYOffset,1.3*s,0,Math.PI*2); ctx.arc(4*s,-29*s*slideMul+bodyYOffset,1.3*s,0,Math.PI*2); ctx.fill();
+    drawArm(-17*s,-20*s*slideMul+bodyYOffset,runB*.8,s,p.sliding,skin.body); drawArm(17*s,-20*s*slideMul+bodyYOffset,runA*.8,s,p.sliding,skin.body);
+    ctx.fillStyle=skin.shorts; roundRectFill(-17*s,0*slideMul+bodyYOffset,34*s,20*s*slideMul,6*s);
+    ctx.fillStyle='#2c4b75'; ctx.fillRect(-10*s,20*s*slideMul+bodyYOffset,7*s,10*s*slideMul); ctx.fillRect(3*s,20*s*slideMul+bodyYOffset,7*s,10*s*slideMul);
+    ctx.fillStyle=skin.accent; ctx.fillRect(-10*s,24*s*slideMul+bodyYOffset,7*s,3*s); ctx.fillRect(3*s,24*s*slideMul+bodyYOffset,7*s,3*s);
+    drawShoe(-8*s,32*s*slideMul+bodyYOffset+Math.sin(p.step)*2*s,s); drawShoe(8*s,32*s*slideMul+bodyYOffset+Math.sin(p.step+Math.PI)*2*s,s);
+    if(p.lanePulse>0){ ctx.strokeStyle=`rgba(255,80,190,${p.lanePulse*.45})`; ctx.lineWidth=6*s; ctx.beginPath(); ctx.arc(0,-6*s+bodyYOffset,28*s+(1-p.lanePulse)*18*s,0,Math.PI*2); ctx.stroke(); }
     ctx.restore();
   }
   function drawLeg(x,y,a,s,sliding){
-    ctx.save(); ctx.translate(x,y);
-    ctx.rotate(sliding ? 1.4 : a*0.35);
-    ctx.fillStyle='#1b2940'; roundRectFill(-4*s,0,8*s,28*s,4*s);
-    ctx.translate(0,26*s); ctx.rotate(sliding ? -1.1 : -a*0.4); roundRectFill(-4*s,0,8*s,24*s,4*s);
-    ctx.restore();
+    ctx.save(); ctx.translate(x,y); ctx.rotate(sliding?1.4:a*0.35); ctx.fillStyle='#1b2940'; roundRectFill(-4*s,0,8*s,28*s,4*s); ctx.translate(0,26*s); ctx.rotate(sliding?-1.1:-a*0.4); roundRectFill(-4*s,0,8*s,24*s,4*s); ctx.restore();
   }
   function drawArm(x,y,a,s,sliding,body){
-    ctx.save(); ctx.translate(x,y); ctx.rotate(sliding ? (x<0?-1.4:1.1) : a*0.45);
-    ctx.fillStyle=body; roundRectFill(-3.5*s,0,7*s,22*s,4*s);
-    ctx.translate(0,20*s); ctx.rotate(sliding ? .5 : -a*0.55);
-    ctx.fillStyle='#ffd3b3'; roundRectFill(-3*s,0,6*s,18*s,4*s);
-    ctx.restore();
+    ctx.save(); ctx.translate(x,y); ctx.rotate(sliding?(x<0?-1.4:1.1):a*0.45); ctx.fillStyle=body; roundRectFill(-3.5*s,0,7*s,22*s,4*s); ctx.translate(0,20*s); ctx.rotate(sliding?.5:-a*0.55); ctx.fillStyle='#ffd3b3'; roundRectFill(-3*s,0,6*s,18*s,4*s); ctx.restore();
   }
   function drawShoe(x,y,s){ ctx.fillStyle='#10213a'; roundRectFill(x-8*s,y,16*s,7*s,3*s); ctx.fillStyle='#ffffff'; ctx.fillRect(x-6*s,y+5*s,12*s,2*s); }
-
   function drawParticles(){
-    for(const p of particles){
-      ctx.save(); ctx.globalAlpha = Math.max(0, p.life / p.maxLife); ctx.fillStyle = p.color; ctx.shadowBlur = 12; ctx.shadowColor = p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill(); ctx.restore();
-    }
+    for(const p of particles){ ctx.save(); ctx.globalAlpha=Math.max(0,p.life/p.maxLife); ctx.fillStyle=p.color; ctx.shadowBlur=12; ctx.shadowColor=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill(); ctx.restore(); }
   }
-  function drawFlash(){ if(flash <= 0) return; ctx.fillStyle = `rgba(255,255,255,${flash*0.18})`; ctx.fillRect(0,0,W,H); }
-
-  function lighten(hex, amt){ return shade(hex, amt); }
-  function darken(hex, amt){ return shade(hex, -amt); }
-  function shade(hex, amt){
-    const c = hex.replace('#',''); const n = parseInt(c,16);
-    let r=(n>>16)&255,g=(n>>8)&255,b=n&255; r=clamp(r+amt,0,255); g=clamp(g+amt,0,255); b=clamp(b+amt,0,255);
-    return `rgb(${r},${g},${b})`;
-  }
-
+  function drawFlash(){ if(flash<=0) return; ctx.fillStyle=`rgba(255,255,255,${flash*0.18})`; ctx.fillRect(0,0,W,H); }
   function roundRectFill(x,y,w,h,r){
-    const rr = Math.min(r,w/2,h/2);
-    ctx.beginPath(); ctx.moveTo(x+rr,y); ctx.arcTo(x+w,y,x+w,y+h,rr); ctx.arcTo(x+w,y+h,x,y+h,rr); ctx.arcTo(x,y+h,x,y,rr); ctx.arcTo(x,y,x+w,y,rr); ctx.closePath(); ctx.fill();
+    const rr=Math.min(r,w/2,h/2); ctx.beginPath(); ctx.moveTo(x+rr,y); ctx.arcTo(x+w,y,x+w,y+h,rr); ctx.arcTo(x+w,y+h,x,y+h,rr); ctx.arcTo(x,y+h,x,y,rr); ctx.arcTo(x,y,x+w,y,rr); ctx.closePath(); ctx.fill();
   }
 
   function render(){
     drawSky(); drawCity(); drawRoad(); drawProps(); drawCoins(); drawObstacles(); drawRunner(); drawParticles(); drawFlash();
   }
-
   function loop(ts){
     if(!running && !paused){ render(); return; }
-    if(!lastTs) lastTs = ts;
-    const dt = Math.min(0.033, (ts-lastTs)/1000);
-    lastTs = ts;
-    update(dt);
-    render();
+    if(!lastTs) lastTs=ts;
+    const dt=Math.min(0.033,(ts-lastTs)/1000); lastTs=ts;
+    update(dt); render();
     if(running || paused) requestAnimationFrame(loop);
   }
 
   function togglePause(){
-    if(gameOver || !ui.startOverlay.classList.contains('hidden')) return;
-    paused = !paused; running = !paused;
-    if(running){ lastTs = 0; setMessage('Run resumed'); requestAnimationFrame(loop); } else setMessage('Paused');
+    if(gameOver || !ui.lobbyOverlay.classList.contains('hidden') === false) return;
+    paused=!paused; running=!paused;
+    if(running){ lastTs=0; setMessage('Run resumed'); requestAnimationFrame(loop); } else setMessage('Paused');
     updateHud();
   }
 
-  ui.pauseBtn.addEventListener('click', togglePause);
-  ui.restartBtn.addEventListener('click', () => { if(ui.startOverlay.classList.contains('hidden')) startGame(); });
+  function isToday(str){
+    const d = new Date();
+    const s = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    return str === s;
+  }
+  function todayKey(){
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function canClaimDaily(){ return !isToday(daily.lastClaimDate); }
+  function claimDaily(){
+    if(!canClaimDaily()) return;
+    daily.streak = isToday(daily.lastClaimDate) ? daily.streak : (daily.streak % 7);
+    const reward = DAILY_REWARD[daily.streak % DAILY_REWARD.length];
+    totalCoins += reward;
+    daily.lastClaimDate = todayKey();
+    daily.streak += 1;
+    saveData(); renderDaily(); renderShop(); renderMissions();
+    setMessage(`Daily reward claimed +${reward} coins`);
+  }
+
+  function renderMissions(){
+    ui.missionsList.innerHTML = '';
+    for(const m of MISSION_DEFS){
+      const value = stats[m.type] || 0;
+      const done = value >= m.target;
+      const claimed = !!missionClaims[m.id];
+      const row = document.createElement('div');
+      row.className = 'missionRow';
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:900">${m.label}</div>
+          <div class="mini">${value} / ${m.target}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="badge coin">+${m.reward} coins</div>
+          <div class="mini ${claimed ? 'ok' : done ? 'coin' : ''}">${claimed ? 'Claimed' : done ? 'Auto Rewarded' : 'In Progress'}</div>
+        </div>
+      `;
+      ui.missionsList.appendChild(row);
+    }
+  }
+
+  function renderDaily(){
+    ui.dailyList.innerHTML = '';
+    for(let i=0;i<DAILY_REWARD.length;i++){
+      const row = document.createElement('div');
+      row.className = 'dailyRow';
+      const ready = canClaimDaily() && i === (daily.streak % DAILY_REWARD.length);
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:900">Day ${i+1}</div>
+          <div class="mini">Reward ${DAILY_REWARD[i]} coins</div>
+        </div>
+        <div class="badge ${ready ? 'coin' : ''}">${ready ? 'Ready' : 'Locked'}</div>
+      `;
+      ui.dailyList.appendChild(row);
+    }
+  }
+
+  function renderRanking(){
+    ui.rankingList.innerHTML = '';
+    if(localRanking.length === 0){
+      ui.rankingList.innerHTML = '<div class="mini">No local records yet.</div>';
+      return;
+    }
+    localRanking.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'rankRow';
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:900">${idx+1}. ${item.name}</div>
+          <div class="mini">Best Score</div>
+        </div>
+        <div class="badge">${item.best}</div>
+      `;
+      ui.rankingList.appendChild(row);
+    });
+  }
+
+  function renderShop(){
+    ui.shopCoins.textContent = Math.floor(totalCoins);
+    ui.shopGrid.innerHTML = '';
+    for(const skin of DEFAULT_SKINS){
+      const owned = ownedSkins.includes(skin.id);
+      const active = selectedSkin === skin.id;
+      const el = document.createElement('div');
+      el.className = 'skinCard' + (active ? ' active' : '');
+      el.innerHTML = `
+        <div style="font-weight:900">${skin.name}</div>
+        <div class="mini">Price: ${skin.price} coins</div>
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+          <div style="width:18px;height:18px;border-radius:50%;background:${skin.body};border:1px solid rgba(255,255,255,.3)"></div>
+          <div style="width:18px;height:18px;border-radius:50%;background:${skin.hood};border:1px solid rgba(255,255,255,.3)"></div>
+          <div style="width:18px;height:18px;border-radius:50%;background:${skin.accent};border:1px solid rgba(255,255,255,.3)"></div>
+        </div>
+      `;
+      const box = document.createElement('div');
+      box.style.marginTop = '10px';
+      if(!owned){
+        const btn = document.createElement('button');
+        btn.textContent = totalCoins >= skin.price ? `Buy ${skin.price}` : `Need ${skin.price}`;
+        btn.disabled = totalCoins < skin.price;
+        btn.onclick = () => {
+          if(totalCoins < skin.price) return;
+          totalCoins -= skin.price;
+          ownedSkins.push(skin.id);
+          selectedSkin = skin.id;
+          saveData(); renderShop();
+        };
+        box.appendChild(btn);
+      } else {
+        const btn = document.createElement('button');
+        btn.textContent = active ? 'Equipped' : 'Equip';
+        btn.disabled = active;
+        btn.onclick = () => {
+          selectedSkin = skin.id;
+          saveData(); renderShop();
+        };
+        box.appendChild(btn);
+      }
+      el.appendChild(box);
+      ui.shopGrid.appendChild(el);
+    }
+  }
+
+  function showTab(name){
+    Object.entries(ui.tabs).forEach(([k, el]) => el.style.display = k === name ? '' : 'none');
+    ui.tabBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === name));
+  }
+
+  ui.tabBtns.forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
   ui.startBtn.addEventListener('click', startGame);
+  ui.claimDailyBtn.addEventListener('click', claimDaily);
   ui.againBtn.addEventListener('click', startGame);
-  ui.shopBtn.addEventListener('click', openShop);
-  ui.openShopStartBtn.addEventListener('click', openShop);
-  ui.openShopGameOverBtn.addEventListener('click', openShop);
-  ui.closeShopBtn.addEventListener('click', closeShop);
+  ui.backLobbyBtn.addEventListener('click', () => {
+    ui.gameOverOverlay.classList.add('hidden');
+    ui.lobbyOverlay.classList.remove('hidden');
+    renderMissions(); renderDaily(); renderRanking(); renderShop(); saveData();
+  });
+  ui.shopBtn.addEventListener('click', () => { ui.lobbyOverlay.classList.remove('hidden'); showTab('shop'); renderShop(); });
+  ui.lobbyBtn.addEventListener('click', () => { ui.lobbyOverlay.classList.remove('hidden'); renderMissions(); renderDaily(); renderRanking(); renderShop(); });
+  ui.pauseBtn.addEventListener('click', togglePause);
+  ui.restartBtn.addEventListener('click', () => { if(ui.lobbyOverlay.classList.contains('hidden')) startGame(); });
+  ui.nicknameInput.addEventListener('change', () => { nickname = (ui.nicknameInput.value || 'Guest').trim().slice(0,18) || 'Guest'; saveData(); });
 
   addEventListener('keydown', e => {
     const key = e.key.toLowerCase();
-    if(key === 'arrowleft' || key === 'a'){ e.preventDefault(); moveLane(-1); }
-    if(key === 'arrowright' || key === 'd'){ e.preventDefault(); moveLane(1); }
-    if(key === 'arrowup' || key === 'w' || key === ' '){ e.preventDefault(); jump(); }
-    if(key === 'arrowdown' || key === 's'){ e.preventDefault(); slide(); }
+    if(key==='arrowleft' || key==='a'){ e.preventDefault(); moveLane(-1); }
+    if(key==='arrowright' || key==='d'){ e.preventDefault(); moveLane(1); }
+    if(key==='arrowup' || key==='w' || key===' '){ e.preventDefault(); jump(); }
+    if(key==='arrowdown' || key==='s'){ e.preventDefault(); slide(); }
   });
 
   function bind(el, fn){
@@ -789,16 +921,19 @@
   }, {passive:true});
   canvas.addEventListener('touchend', e => {
     if(!running || paused || touchStartX == null) return;
-    const endX = e.changedTouches[0].clientX, endY = e.changedTouches[0].clientY;
-    const dx = endX - touchStartX, dy = endY - touchStartY;
-    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 24) moveLane(dx < 0 ? -1 : 1);
-    else if(Math.abs(dy) > 24) { if(dy < 0) jump(); else slide(); }
+    const endX=e.changedTouches[0].clientX, endY=e.changedTouches[0].clientY;
+    const dx=endX-touchStartX, dy=endY-touchStartY;
+    if(Math.abs(dx)>Math.abs(dy) && Math.abs(dx)>24) moveLane(dx<0?-1:1);
+    else if(Math.abs(dy)>24){ if(dy<0) jump(); else slide(); }
     touchStartX = touchStartY = null;
   }, {passive:true});
 
   resetWorld();
-  saveData();
+  renderMissions();
+  renderDaily();
+  renderRanking();
   renderShop();
+  saveData();
   render();
 })();
 </script>
