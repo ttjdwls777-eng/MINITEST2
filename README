@@ -1,16 +1,25 @@
-FA SKY DODGE
+FA Street Rush Ultimate
 
-Upload the contents of this folder to your GitHub repository.
-For GitHub Pages:
-1. Create or open a repository.
-2. Upload index.html.
-3. In Settings > Pages, set the source branch.
-4. Open the published URL.
+Files
+- index.html
+- firebase-config.js
 
-Controls
-- PC: Arrow keys / A D
-- Mobile: Touch buttons at the bottom
-- Pause: P or Space or Pause button
-- Fullscreen: button on start screen or key F
+GitHub Pages upload
+1. Upload both files into one folder/repo.
+2. Open GitHub Pages on that folder/repo.
+3. The game works immediately with local save, daily reward, missions, shop, and local ranking.
 
-All records are stored locally in the browser.
+Online ranking
+- This build is Firebase-ready, but live online ranking needs a real Firebase project.
+- Put your Firebase values into firebase-config.js
+- Then connect your ranking save/load logic where you want to extend it.
+
+What is included now
+- Improved collision logic
+- Jump and slide gameplay
+- Lobby
+- Missions
+- Daily reward
+- Shop and skins
+- Local ranking
+- Firebase-ready config file
